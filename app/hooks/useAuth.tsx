@@ -1,6 +1,6 @@
 "use client";
 import { useContext } from "react";
-import { AuthContext } from "../components/context/AuthContex";
+import { AuthContext } from "../components/context/AuthContext";
 export function useAuth() {
   const context = useContext(AuthContext);
 

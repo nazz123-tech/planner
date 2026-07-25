@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthGuard } from "./components/guard/AuthGuard";
-import { AuthProvider } from "./components/context/AuthContex";
+import { AuthProvider } from "./components/context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PLANer",
+  title: "planly",
   description: "Plan in own way",
 };
 
@@ -27,9 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <AuthGuard>
-          <AuthProvider>{children}</AuthProvider>
-        </AuthGuard>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

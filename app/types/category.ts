@@ -1,6 +1,6 @@
 export interface Category {
-    id: string;
-    userId:string
+  id: string;
   name: string;
-  color: string;
+  color: string; 
+  createdAt: string;
 }
