@@ -5,8 +5,8 @@ export const Navigation = () => {
   const pathname = usePathname();
   const NAV_ITEMS = [
     { href: "/", icon: "home", label: "Home" },
-    { href: "/calendar", icon: "calendar", label: "Home" },
-    { href: "/notes", icon: "notes", label: "Home" },
+    { href: "/calendar", icon: "calendar", label: "calendar" },
+    { href: "/notes", icon: "notes", label: "notes" },
   ];
   return (
     <nav>
@@ -14,6 +14,7 @@ export const Navigation = () => {
         const isActive = pathname === item.href;
         return (
           <Link
+            key={item.label}
             href={item.href}
             // className={`${styles.item} ${isActive ? styles.active : ""}`}
           >
