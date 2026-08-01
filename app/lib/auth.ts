@@ -1,11 +1,12 @@
 // SIGNIN SIGNUP LOGOUT GOOGLE AUTH
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider , signOut} from 'firebase/auth';
 import { auth } from './firebase';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import type { User } from 'firebase/auth';
 import { RegisterFormData } from '../components/forms/RegisterForm/RegisterForm';
+import { LoginFormData } from '../components/forms/LoginForm/LoginForm';
 
 export async function ensureUserDocument(user: User) {
   const userRef = doc(db, 'users', user.uid);
@@ -23,7 +24,7 @@ export async function ensureUserDocument(user: User) {
 // SIGNIN
 const googleProvider = new GoogleAuthProvider();
 
-export async function signInWithEmail(email: string, password: string) {
+export async function signInWithEmail({email, password}:LoginFormData) {
   return signInWithEmailAndPassword(auth, email, password);
 }
 
@@ -41,3 +42,9 @@ export const signUp = async ({email,password,name}:RegisterFormData) => {
     await userCredential.user.reload()
   return userCredential;
 };
+
+// LOGOUT
+
+export const logout = async () => {
+  await signOut(auth)
+}

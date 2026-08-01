@@ -5,6 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { signUp } from "@/app/lib/auth";
 import { useRouter } from "next/navigation";
 import { GoogleAuth } from "../../ui/GoogleAuth/GoogleAuth";
+import Link from "next/link";
 export interface RegisterFormData {
   email: string;
   password: string;
@@ -35,6 +36,7 @@ export const RegisterForm = () => {
         <button type="submit">Sign Up</button>
         <GoogleAuth></GoogleAuth>
       </form>
+      <Link href={"/login"}>Alreay have an account?</Link>
     </div>
   );
 };
