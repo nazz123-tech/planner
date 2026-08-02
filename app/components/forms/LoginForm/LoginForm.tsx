@@ -12,7 +12,7 @@ export interface LoginFormData {
 }
 export const LoginForm = () => {
   const router = useRouter();
-  const { register, handleSubmit, setError } = useForm<LoginFormData>({
+  const { register, handleSubmit } = useForm<LoginFormData>({
     resolver: yupResolver(loginSchema),
   });
   const onSubmit = async (data: LoginFormData) => {
