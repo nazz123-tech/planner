@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { collection, onSnapshot } from "firebase/firestore";
 import { useEffect } from "react";
 import { db } from "@/app/lib/firebase";
-import { useAuth } from "./useAuth";
+import { useAuth } from "../useAuth";
 import type { Task } from "@/app/types/task";
 
 export function useTasks() {

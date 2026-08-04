@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteDoc, doc } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
-import { useAuth } from "./useAuth";
+import { useAuth } from "../useAuth";
+import type { Task } from "@/app/types/task";
 
-export function useDeleteTask() {
+export function useCreateTask() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (taskId: string) =>
-      deleteDoc(doc(db, `users/${user!.uid}/tasks/${taskId}`)),
+    mutationFn: (task: Omit<Task, "id">) =>
+      addDoc(collection(db, `users/${user!.uid}/tasks`), task),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks", user?.uid] });
     },
