@@ -1,39 +1,98 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    /* ===== Base surfaces ===== */
+    --background: #E4D6B4;
+    /* фон сторінки */
+    --background-deep: #D4C29A;
+    /* заглиблений фон (напр. інпути, треки прогрес-барів) */
+    --card-background: #EDE3C6;
+    /* фон карток/панелей */
+
+    /* ===== Primary (Forest) ===== */
+    --primary: #2C4A3E;
+    /* основний бренд-колір: кнопки, активні іконки, hero-фон */
+    --primary-hover: #234438;
+    /* hover для primary-кнопок */
+    --primary-deep: #1D332A;
+    /* active/pressed для primary-кнопок */
+
+    /* ===== Accent (Olive) ===== */
+    --accent: #7A7B4A;
+    /* другорядний акцент: теги, бейджі, прогрес-бари */
+    --accent-hover: #9B9C6E;
+    /* hover для accent-елементів */
+    --accent-deep: #5F6039;
+    /* active/pressed для accent-елементів */
+
+    /* ===== Borders ===== */
+    --border: #C9B98E;
+    /* рамки, розділові лінії на світлому фоні */
+    --border-light: rgba(228, 214, 180, 0.18);
+    /* рамки на темному (primary) фоні */
+
+    /* ===== Text on light surfaces (background / card-background) ===== */
+    --text-primary: #22301F;
+    /* основний текст */
+    --text-secondary: rgba(34, 48, 31, 0.6);
+    /* другорядний текст: підписи, час */
+    --text-muted: rgba(34, 48, 31, 0.4);
+    /* найслабший текст: плейсхолдери, лейбли */
+
+    /* ===== Text on dark surfaces (primary фон) ===== */
+    --text-on-primary: #E4D6B4;
+    /* текст на forest-фоні (hero, темні кнопки) */
+
+    /* ===== States ===== */
+    --disabled: #6B7A70;
+    /* фон неактивних елементів */
+    --disabled-text: rgba(34, 48, 31, 0.4);
+    /* текст неактивних елементів */
+    --font-main:var(--font-mono)  ;
+    --font-heading: var(--font-fredoka);
 }
 
-
-
 html {
-  height: 100%;
+    height: 100%;
 }
 
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-mono);
+    background-color: var(--background);
+    color:var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
+
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }
 
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #141414;
+    border-radius: 10px;
+}

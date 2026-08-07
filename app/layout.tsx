@@ -1,36 +1,42 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
 import { AuthProvider } from "./components/context/AuthContext";
 import { QueryProvider } from "./components/providers/QueryProvider";
+import { Fredoka, Space_Mono } from "next/font/google";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const fredoka = Fredoka({
+    variable: "--font-fredoka",
+    subsets: ["latin"],
+    weight: ["500", "600", "700"],
+    display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const spaceMono = Space_Mono({
+    variable: "--font-mono",
+    subsets: ["latin"],
+    weight: ["400", "700"],
+    display: "swap",
 });
-
 export const metadata: Metadata = {
-  title: "planly",
-  description: "Plan in own way",
+    title: "Planly",
+    description: "Plan in own way",
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>
-        <QueryProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </QueryProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en" className={`${fredoka.variable} ${spaceMono.variable}`}>
+            <body>
+                <QueryProvider>
+                    <AuthProvider>
+                        <div>{children}</div>
+                    </AuthProvider>
+                </QueryProvider>
+            </body>
+        </html>
+    );
 }
