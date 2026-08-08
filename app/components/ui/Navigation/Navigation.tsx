@@ -7,6 +7,7 @@ import Icon from "../Icon/Icon";
 import styles from "./Navigation.module.css";
 import { useRouter } from "next/navigation";
 import { logout } from "@/app/lib/auth";
+import { Logo } from "../Logo/Logo";
 
 export const Navigation = () => {
     const pathname = usePathname();
@@ -26,7 +27,7 @@ export const Navigation = () => {
 
     return (
         <div className={`${styles.container}`}>
-            <span>Planly</span>
+            <Logo />
             <nav className={styles.navbar}>
                 {NAV_ITEMS.map((item) => {
                     const isActive = pathname === item.href;
