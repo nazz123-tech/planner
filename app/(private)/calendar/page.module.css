@@ -1,6 +1,6 @@
 .container{
     max-width: 1170px;
-    height: 100vh;
+    height: 80vh;
     overflow-y: scroll;
     margin: 0 auto;
 }

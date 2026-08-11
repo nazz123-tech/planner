@@ -66,7 +66,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
     const categoryColorById = useMemo(() => {
         const map = new Map<string, string>();
         for (const category of categories) {
-            map.set(category.id, category.color);
+            map.set(category.id, category.color ?? "#8a8a8a");
         }
         return map;
     }, [categories]);
@@ -219,7 +219,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                     const dayTasks = dateKey
                         ? (tasksByDate.get(dateKey) ?? [])
                         : [];
-                    const visibleTasks = dayTasks.slice(0, 2);
+                    const visibleTasks = dayTasks.slice(0, 3);
                     const hiddenCount = dayTasks.length - visibleTasks.length;
 
                     return (
@@ -274,18 +274,18 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                             {visibleTasks.length > 0 && (
                                 <div className={styles.eventsList}>
                                     {visibleTasks.map((task) => {
-                                        const color = task.categoryId
-                                            ? (categoryColorById.get(
-                                                  task.categoryId,
-                                              ) ?? "#8a8a8a")
-                                            : "#8a8a8a";
+                                        const color =
+                                            task.categoryId &&
+                                            categoryColorById.get(
+                                                task.categoryId,
+                                            );
+
                                         return (
                                             <div
                                                 key={task.id}
                                                 className={styles.eventPill}
                                                 style={{
-                                                    backgroundColor: `${color}22`,
-                                                    color,
+                                                    backgroundColor: `${color}`,
                                                 }}
                                             >
                                                 {task.title}
@@ -294,7 +294,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                     })}
                                     {hiddenCount > 0 && (
                                         <span className={styles.moreLabel}>
-                                            +{hiddenCount} ще
+                                            +{hiddenCount} more
                                         </span>
                                     )}
                                 </div>
@@ -438,3 +438,4 @@ const Select = ({ name, value, options, onChange }: SelectProps) => (
         </select>
     </div>
 );
+

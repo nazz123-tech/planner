@@ -1,13 +1,22 @@
 "use client";
+import Hero from "@/app/components/ui/Hero/Hero";
 import styles from "./page.module.css";
-import { useAuth } from "../../hooks/useAuth";
-
-export default function Home() {
+import { useTodayTasks } from "@/app/hooks/tasks/useTodayTasks";
+import { useAuth } from "@/app/hooks/useAuth";
+import { TodayTasks } from "@/app/components/ui/TodayTasks/TodayTasks";
+export default function Dashboard() {
+    const { tasks, totalTasks, done, isLoading } = useTodayTasks();
     const { user } = useAuth();
-
     return (
-        <div className={styles.container}>
-            <h2 className={styles.title}>Good day, {user?.displayName}</h2>
+        <div className={styles.dashboard}>
+            <Hero
+                user={user}
+                totalTasks={totalTasks}
+                done={done}
+                isLoading={isLoading}
+            />
+            <TodayTasks tasks={tasks} onDone={() => <></>} />
         </div>
     );
 }
+

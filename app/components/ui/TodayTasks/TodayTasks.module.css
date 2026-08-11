@@ -1,0 +1,45 @@
+
+.tasks{
+    width: 1170px;
+    
+}
+.sectionLabel{
+    font-size: 20px;
+    font-weight: 500;
+    padding-left: 14px;
+    
+}
+.header{
+    margin-bottom: 10PX;
+}
+
+.item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+    justify-content: space-between;
+    padding: 0 20px;
+    
+}
+
+.list{
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    background-color: var(--card-background);
+    border: solid 1px var(--border);
+    min-height: 40px;
+    max-height: 200px;
+    border-radius: 30px;
+}
+.item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.field{
+    display: flex;
+    flex-direction: row;
+    gap:10px;
+    align-items: center;
+}

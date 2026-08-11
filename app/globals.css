@@ -52,7 +52,8 @@
     --disabled-text: rgba(34, 48, 31, 0.4);
     /* текст неактивних елементів */
     --font-main:var(--font-mono)  ;
-    --font-heading: var(--font-fredoka);
+    --font-heading: var(--font-source);
+    --font-secondary:var(--font-inter)
 }
 
 html {
@@ -84,7 +85,7 @@ a {
 }
 
 ::-webkit-scrollbar {
-    width: 10px;
+    width: none;
 }
 
 ::-webkit-scrollbar-track {

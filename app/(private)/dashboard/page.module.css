@@ -1,13 +1,7 @@
-.container{
+.dashboard{
+    width: 1170px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    justify-items: center;
-    align-items: center;
-    margin: 0 auto;
-    width: 1170px;
-}
-.title{
-    font-family: var(--font-heading);
-    font-weight: 400;
-    font-size: 100px;
+    gap:30px;
 }

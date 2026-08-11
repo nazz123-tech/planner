@@ -6,5 +6,4 @@ export interface Task {
   time?: string;
   isDone: boolean;
   categoryId?: string;
-  createdAt: string;
 }

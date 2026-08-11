@@ -1,14 +1,13 @@
 "use client";
 import { ContinuousCalendar } from "@/app/components/ui/Calendar/Calendar";
 import { useTasks } from "@/app/hooks/tasks/useTasks";
-import { Category } from "@/app/types/category";
+import { useCategories } from "@/app/hooks/categories/useCategories";
 import styles from "./page.module.css";
 import Modal from "@/app/components/ui/Modal/Modal";
 
 export default function CalendarPage() {
     const { data: tasks } = useTasks();
-    // const { data: categories } = useCategories();
-    const categories: Category[] = [];
+    const { data: categories } = useCategories();
     return (
         <div className={styles.container}>
             <ContinuousCalendar
@@ -24,3 +23,4 @@ export default function CalendarPage() {
         </div>
     );
 }
+

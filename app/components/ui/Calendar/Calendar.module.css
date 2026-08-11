@@ -11,18 +11,16 @@
 
 .header {
     position: sticky;
-    max-width: 1160px;
+    width: 1170px;
     background: var(--card-background);
     top: 0px;
     z-index: 50;
-    width: 100%;
     border-radius: 20px 20px 0 0;
     padding: 1.75rem 1.25rem 0;
 }
 
 .headerRow {
     display: flex;
-    max-width: 1160px;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
@@ -105,8 +103,8 @@
 }
 
 .grid {
-    width: 1170px;
     padding: 1rem 1.25rem 0;
+    width: 1170px;
 }
 
 .week {
@@ -132,7 +130,7 @@
 
 .dayCell:hover {
     z-index: 20;
-    border-color: var(--fill-primary, #1a1a1a);
+    border-color: var(--accent-hover);
 }
 
 .dayHeader {
@@ -145,21 +143,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     font-size: 13px;
     color: var(--text-primary, #1a1a1a);
 }
 
 .today {
-    background: var(--fill-primary, #1a1a1a);
-    color: var(--on-primary, #fff);
+    background: var(--primary);
+    color: var(--background);
     font-weight: 600;
 }
 
 .outsideMonth {
-    color: var(--text-muted, #c0c0c0);
+    color: var(--text-muted);
 }
 
 .addButton {
@@ -167,7 +165,7 @@
     padding: 2px;
     background: transparent;
     border: none;
-    color: var(--text-accent, #4a7dff);
+    color: var(--text-accent);
     opacity: 0;
     cursor: pointer;
     transition: opacity 0.15s ease;
@@ -207,7 +205,7 @@
 }
 
 .moreLabel {
-    font-size: 16px;
+    font-size: 10px;
     color: var(--text-muted);
     padding-left: 2px;
 }
@@ -229,9 +227,10 @@
     }
 
     .dayNumber {
-        width: 32px;
-        height: 32px;
-        font-size: 16px;
+        width: 36px;
+        height: 36px;
+        font-size: 22px;
+        
     }
 
     .monthLabel {
