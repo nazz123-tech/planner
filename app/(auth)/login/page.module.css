@@ -1,0 +1,6 @@
+.loginPage{
+    display: flex;
+    flex-direction: column;
+    margin-top: 10vh;
+    align-items: center;
+}

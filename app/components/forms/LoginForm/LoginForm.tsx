@@ -1,37 +1,115 @@
 "use client";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { loginSchema } from "../schemas";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signInWithEmail } from "@/app/lib/auth";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { GoogleAuth } from "../../ui/GoogleAuth/GoogleAuth";
+import styles from "./Login.module.css";
 import Link from "next/link";
+
 export interface LoginFormData {
-  email: string;
-  password: string;
+    email: string;
+    password: string;
 }
 export const LoginForm = () => {
-  const router = useRouter();
-  const { register, handleSubmit } = useForm<LoginFormData>({
-    resolver: yupResolver(loginSchema),
-  });
-  const onSubmit = async (data: LoginFormData) => {
-    await signInWithEmail(data);
-    router.push("/");
-  };
-  return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <input {...register("email")}></input>
+    const router = useRouter();
+    const [isVisible, setIsVisible] = useState(false);
+    const {
+        register,
+        handleSubmit,
+        setError,
+        formState: { errors },
+    } = useForm<LoginFormData>({
+        resolver: yupResolver(loginSchema),
+    });
+    const onSubmit = async (data: LoginFormData) => {
+        try {
+            await signInWithEmail(data);
+            router.push("/");
+        } catch (error) {
+            const err = error as Error & {
+                response?: { data?: { message?: string } };
+            };
+            const errorMessage =
+                err.response?.data?.message || "User not found";
+
+            setError("root.serverError", {
+                type: "manual",
+                message: errorMessage,
+            });
+            toast.error(errorMessage);
+        }
+    };
+    return (
+        <div className={styles.form}>
+            <div className={styles.header}>
+                <h2 className={styles.title}>Login</h2>
+            </div>
+
+            <form
+                className={styles.formBlock}
+                onSubmit={handleSubmit(onSubmit)}
+            >
+                <div className={styles.field}>
+                    <label className={styles.label}>EMAIL</label>
+                    <input
+                        className={styles.input}
+                        {...register("email")}
+                        placeholder="your@email.com"
+                    ></input>
+                    {errors.email && (
+                        <p className={styles.error}>{errors.email.message}</p>
+                    )}
+                </div>
+                <div className={styles.field}>
+                    <label className={styles.label}>PASSWORD</label>
+                    <div className={styles.inputWrapper}>
+                        <input
+                            className={styles.input}
+                            type={isVisible ? "text" : "password"}
+                            {...register("password")}
+                            placeholder="••••••••"
+                        />
+                        <button
+                            onClick={() => setIsVisible((prev) => !prev)}
+                            className={styles.showPass}
+                            type="button"
+                        >
+                            {isVisible ? <p>Hide</p> : <p>Show</p>}
+                        </button>
+                    </div>
+
+                    {errors.password && (
+                        <p className={styles.error}>
+                            {errors.password.message}
+                        </p>
+                    )}
+                    <Link className={styles.linkPass} href={""}>
+                        Forgot password?
+                    </Link>
+                </div>
+
+                <div className={styles.buttonsGroup}>
+                    <button className={styles.signIn} type="submit">
+                        Sign In
+                    </button>
+                    <span className={styles.line} />
+                    <div className={styles.divider}>
+                        <div className={styles.line}></div>
+                        <span>OR</span>
+                        <div className={styles.line}></div>
+                    </div>
+                    <span className={styles.line} />
+                    <GoogleAuth></GoogleAuth>
+                </div>
+            </form>
+            <Link className={styles.link} href={"/register"}>
+                First time? <span>Sign up here!</span>
+            </Link>
         </div>
-        <div>
-          <input type="password" {...register("password")}></input>
-        </div>
-        <button type="submit">Sign Up</button>
-        <GoogleAuth></GoogleAuth>
-      </form>
-      <Link href={"/register"}>First time?</Link>
-    </div>
-  );
+    );
 };
+

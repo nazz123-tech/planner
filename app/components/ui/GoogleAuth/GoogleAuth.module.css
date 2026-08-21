@@ -1,0 +1,22 @@
+.button{
+    width: 100%;
+        height: 48px;
+        border-radius: 9999px;
+        cursor: pointer;
+        font-family: var(--font-secondary);
+        font-size: 16px;
+        font-weight: 500;
+        background-color: #Fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border:none;
+        box-shadow: 1px 1px0 var(--signin-shadow, lightcoral);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+}
+.button:hover{
+    box-shadow: 0 4px var(--signin-shadow, lightcoral);
+        transform: translateY(-2px);
+}

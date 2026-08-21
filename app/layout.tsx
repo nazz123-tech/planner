@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "./components/context/AuthContext";
 import { QueryProvider } from "./components/providers/QueryProvider";
 import { Space_Mono, Source_Serif_4, Inter } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 
 const source = Source_Serif_4({
     variable: "--font-source",
@@ -40,6 +41,7 @@ export default function RootLayout({
             <body>
                 <QueryProvider>
                     <AuthProvider>
+                        <Toaster />
                         <div>{children}</div>
                     </AuthProvider>
                 </QueryProvider>
