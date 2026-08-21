@@ -68,11 +68,6 @@
     transition: all 0.2s ease;
 }
 
-.input:focus {
-    border: 2px solid var(--accent);
-    background-color: var(--background-deep);
-    outline: none;
-}
 
 .input::placeholder {
     color: var(--text-muted);
@@ -86,6 +81,7 @@
         height: 46px;
     border-radius: 9999px;
     border: 1px solid var(--border);
+    font-family: var(--font-secondary);
     background-color: var(--text-primary);
     color: var(--background);
     cursor: pointer;

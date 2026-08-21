@@ -30,7 +30,7 @@
     background-color: var(--card-background);
     border: solid 1px var(--border);
     min-height: 40px;
-    max-height: 200px;
+    max-height: 600px;
     border-radius: 30px;
 }
 .item:not(:last-child) {

@@ -6,8 +6,12 @@ import Icon from "../Icon/Icon";
 import { Logo } from "../Logo/Logo";
 import { logout } from "@/app/lib/auth";
 import styles from "./Navigation.module.css";
+import { useState } from "react";
+import Modal from "../Modal/Modal";
+import { CreateForm } from "../../forms/CreateForm/CreateForm";
 
 export const Navigation = () => {
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
     const pathname = usePathname();
     const router = useRouter();
 
@@ -103,13 +107,21 @@ export const Navigation = () => {
                     );
                 })}
             </nav>
-            <button className={styles.fab} aria-label="Add item">
+            <button
+                onClick={() => setModalOpen(true)}
+                className={styles.fab}
+                aria-label="Add item"
+            >
                 <Icon name="add" size={24} />
             </button>
             <button className={styles.button} onClick={handleLogout}>
                 Logout
             </button>
+            {modalOpen && (
+                <Modal onClose={() => setModalOpen(false)}>
+                    <CreateForm onSuccess={() => setModalOpen(false)} />
+                </Modal>
+            )}
         </div>
     );
 };
-

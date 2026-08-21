@@ -1,0 +1,92 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.form{
+    display: flex;
+    flex-direction: column;
+    gap:20px
+}
+.text{
+    resize: none;
+    width: 400px;
+    border: 2px solid var(--border);
+        background-color: var(--background-deep);
+        border-radius: 15px;
+        padding: 5px 70px 0 20px;
+        height: 60px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    width: 100%;
+}
+
+.label {
+    font-family: var(--font-main);
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.input {
+    background-color: var(--background-deep);
+    font-family: var(--font-main);
+    font-size: 15px;
+    color: var(--text-primary);
+    width: 100%;
+    height: 48px;
+    border: 2px solid var(--border);
+    border-radius: 15px;
+    padding: 0 10px 0 20px;
+
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.input::placeholder, .text::placeholder{
+    color: var(--text-muted);
+    font-size: 15px;
+}
+.timeBlock{
+    display: flex;
+    flex-direction: column;
+}
+.switcher{
+    display: inline-flex;
+    background-color: var(--background-deep);
+    width: 300px;
+    border-radius: 999px;
+    height: 48px;
+    align-items: center;
+    padding: 2px 2px;
+    
+    
+    
+}
+.switchBtn{
+    width: 50%;
+    height: 42px;
+    border: none;
+    background-color: transparent;
+    font-family: var(--font-secondary);
+        font-weight: 500;
+        font-size: 15px;
+}
+.active{
+    background-color: var(--primary);
+    color:var(--text-on-primary);
+    border-radius: 999px;
+}
