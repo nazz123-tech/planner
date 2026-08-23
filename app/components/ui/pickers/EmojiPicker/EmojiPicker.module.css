@@ -1,0 +1,58 @@
+.wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.trigger {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    border: 1px solid var(--border, #e2e2e2);
+    background: var(--surface-1, #fff);
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.selected {
+    line-height: 1;
+}
+
+.grid {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    padding: 10px;
+    border-radius: 16px;
+    border: 1px solid var(--border, #e2e2e2);
+    background: var(--surface-2, #fff);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    width: 240px;
+}
+
+.option {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.option:hover {
+    background: var(--surface-3, #f2f2f2);
+}
+
+.active {
+    background: var(--fill-primary-soft, #e5e5e5);
+}

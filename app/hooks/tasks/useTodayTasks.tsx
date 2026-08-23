@@ -9,16 +9,17 @@ function getTodayISO(): string {
 export function useTodayTasks() {
     const { data: tasks, isLoading } = useTasks();
     const today = getTodayISO();
+
     const todayTasks = useMemo(() => {
         if (!tasks) return [];
         return tasks.filter((task) => task.date === today);
-    }, [tasks]);
-    const tasksIsDone = useMemo(() => {
-        return tasks?.filter((task) => task.isDone === true);
-    }, [tasks]);
-    const done = tasksIsDone?.length;
+    }, [tasks, today]);
+
+    const done = useMemo(() => {
+        return todayTasks.filter((task) => task.isDone).length;
+    }, [todayTasks]);
+
     const totalTasks = todayTasks.length;
 
     return { tasks: todayTasks, done, totalTasks, isLoading };
 }
-

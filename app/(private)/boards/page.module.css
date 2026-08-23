@@ -1,4 +1,40 @@
 .container {
+    
     max-width: 1170px;
     margin: 0 auto;
+}
+.grid{
+    display: grid;
+        grid-template-columns: auto auto auto;
+        gap:20px
+
+}
+.header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 15px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.title{
+    font-family: var(--font-heading);
+    font-size: 40px;
+    font-weight: 600;
+
+}
+.subtext{
+    font-family: var(--font-secondary);
+    color:var(--text-secondary);
+}
+.createBoardBtn{
+    font-family: var(--font-secondary);
+        font-weight: 600;
+        width: 120px;
+        height: 40px;
+        border: none;
+        border-radius: 100px;
+        background-color: var(--primary);
+        color: var(--text-on-primary);
+        cursor: pointer;
 }

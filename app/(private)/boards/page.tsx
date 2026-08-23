@@ -7,14 +7,16 @@ export default function Boards() {
     const { boards } = useBoards();
     return (
         <div className={styles.container}>
-            <div>
-                <div>
-                    <h3>Boards</h3>
-                    <p>Tasks and notes are grouped by categories</p>
+            <div className={styles.header}>
+                <div className={styles.headerText}>
+                    <h3 className={styles.title}>Boards</h3>
+                    <p className={styles.subtext}>
+                        Tasks and notes are grouped by categories
+                    </p>
                 </div>
-                <button>New board</button>
+                <button className={styles.createBoardBtn}>New board</button>
             </div>
-            <div>
+            <div className={styles.grid}>
                 {boards.map((board) => (
                     <BoardCard key={board.id} {...board} />
                 ))}
@@ -22,4 +24,3 @@ export default function Boards() {
         </div>
     );
 }
-

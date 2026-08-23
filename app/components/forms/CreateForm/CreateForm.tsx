@@ -88,7 +88,7 @@ export const CreateForm = ({ onSuccess }: CreateFormProps) => {
 
             <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
                 <div className={styles.field}>
-                    <label className={styles.label}>Title</label>
+                    <label className={styles.label}>TITLE</label>
                     <input
                         className={styles.input}
                         {...register("title")}
@@ -103,7 +103,20 @@ export const CreateForm = ({ onSuccess }: CreateFormProps) => {
                     )}
                 </div>
                 <div className={styles.field}>
-                    <label className={styles.label}>Description</label>
+                    <label className={styles.label}>CATEGORY</label>
+                    <select {...register("categoryId")}>
+                        <option value="">Select Category</option>
+                        <option value="1">Work</option>
+                        <option value="2">Personal</option>
+                    </select>
+                    {errors.categoryId && (
+                        <p className={styles.error}>
+                            {errors.categoryId.message}
+                        </p>
+                    )}
+                </div>
+                <div className={styles.field}>
+                    <label className={styles.label}>DESCRIPTION</label>
                     <textarea
                         className={styles.text}
                         {...register("description")}
@@ -119,7 +132,7 @@ export const CreateForm = ({ onSuccess }: CreateFormProps) => {
                 {formType === "task" && (
                     <div className={styles.timeBlock}>
                         <div className={styles.field}>
-                            <label className={styles.label}>Date</label>
+                            <label className={styles.label}>DATE</label>
                             <input
                                 className={styles.input}
                                 {...register("date")}
@@ -133,7 +146,7 @@ export const CreateForm = ({ onSuccess }: CreateFormProps) => {
                         </div>
 
                         <div className={styles.field}>
-                            <label className={styles.label}>Time</label>
+                            <label className={styles.label}>TIME</label>
                             <input
                                 className={styles.input}
                                 {...register("time")}
@@ -147,19 +160,6 @@ export const CreateForm = ({ onSuccess }: CreateFormProps) => {
                         </div>
                     </div>
                 )}
-                <div className={styles.field}>
-                    <label className={styles.label}>Category</label>
-                    <select {...register("categoryId")}>
-                        <option value="">Select Category</option>
-                        <option value="1">Work</option>
-                        <option value="2">Personal</option>
-                    </select>
-                    {errors.categoryId && (
-                        <p className={styles.error}>
-                            {errors.categoryId.message}
-                        </p>
-                    )}
-                </div>
 
                 <button
                     className={styles.subBtn}

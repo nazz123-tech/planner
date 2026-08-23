@@ -2,12 +2,13 @@ import { Task } from "@/app/types/task";
 import styles from "./TodayTasks.module.css";
 
 import { EmptyTask } from "../Empty/EmptyTask/EmptyTask";
+import { useToggleTaskDone } from "@/app/hooks/tasks/useToggleDone";
 interface TodayTasksProps {
     tasks: Task[];
-    onDone: () => void;
     onCreate: () => void;
 }
-export const TodayTasks = ({ tasks, onDone, onCreate }: TodayTasksProps) => {
+export const TodayTasks = ({ tasks, onCreate }: TodayTasksProps) => {
+    const { mutate: toggleDone } = useToggleTaskDone();
     return (
         <div className={styles.tasks}>
             <div className={styles.card}>
@@ -22,7 +23,13 @@ export const TodayTasks = ({ tasks, onDone, onCreate }: TodayTasksProps) => {
                             <li className={styles.item} key={task.id}>
                                 <div className={styles.field}>
                                     <input
-                                        onChange={onDone}
+                                        checked={task.isDone}
+                                        onChange={() =>
+                                            toggleDone({
+                                                taskId: task.id,
+                                                isDone: task.isDone,
+                                            })
+                                        }
                                         type="checkbox"
                                         name="status"
                                         id=""

@@ -1,3 +1,4 @@
+import styles from "./BoardCard.module.css";
 interface BoardCardProps {
     id: string;
     name: string;
@@ -9,17 +10,32 @@ interface BoardCardProps {
 }
 export const BoardCard = (board: BoardCardProps) => {
     return (
-        <div>
-            <h3>{board.name}</h3>
-            <span dangerouslySetInnerHTML={{ __html: board.emoji }} />
-            <div>
-                <p>
-                    {board.taskDoneCount} of {board.taskCount}
-                </p>
-                {board.noteCount > 0 && <p>{board.noteCount}</p>}
+        <div className={styles.card}>
+            <div className={styles.cardHeader}>
+                <div className={styles.emojiWrapper}>
+                    <span className={styles.emoji}>{board.emoji}</span>
+                </div>
+                <div className={styles.headerRight}>
+                    {board.taskCount > 0 && (
+                        <div className={styles.badge}>{board.taskCount}</div>
+                    )}
+
+                    {board.noteCount > 0 && (
+                        <div className={styles.badge}>{board.noteCount}</div>
+                    )}
+                </div>
             </div>
-            <progress value={board.progress} />
+
+            <div className={styles.info}>
+                <h2 className={styles.cardName}>{board.name}</h2>
+                <p className={styles.subtext}>
+                    {board.taskDoneCount} of {board.taskCount} tasks
+                </p>
+                {board.noteCount > 0 && (
+                    <p className={styles.subtext}>● {board.noteCount}</p>
+                )}
+            </div>
+            <progress className={styles.progress} value={board.progress} />
         </div>
     );
 };
-

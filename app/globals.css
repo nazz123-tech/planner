@@ -85,7 +85,7 @@ a {
 }
 
 ::-webkit-scrollbar {
-    width: none;
+    display: none;
 }
 
 ::-webkit-scrollbar-track {
