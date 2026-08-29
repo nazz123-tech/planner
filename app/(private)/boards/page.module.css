@@ -28,13 +28,38 @@
     color:var(--text-secondary);
 }
 .createBoardBtn{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:0;
+    justify-content: center;
     font-family: var(--font-secondary);
         font-weight: 600;
-        width: 120px;
-        height: 40px;
+        width: 50px;
+        height: 50px;
         border: none;
+        font-size: 15px;
         border-radius: 100px;
         background-color: var(--primary);
         color: var(--text-on-primary);
         cursor: pointer;
+        overflow: hidden;
+        transition: width 0.3s ease;
+}
+.createBoardBtn:hover{
+    gap:4px;
+    width: 120px;
+    
+}
+.btnText{
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: max-width 0.3s ease, opacity 0.2s ease; 
+    
+}
+.createBoardBtn:hover .btnText {
+  max-width: 150px; 
+  opacity: 1;
 }

@@ -1,8 +1,15 @@
 "use client";
 
+import {
+    LayoutDashboard,
+    Calendar,
+    Kanban,
+    CheckSquare,
+    Plus,
+    LogOut,
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import Icon from "../Icon/Icon";
 import { Logo } from "../Logo/Logo";
 import { logout } from "@/app/lib/auth";
 import styles from "./Navigation.module.css";
@@ -16,10 +23,10 @@ export const Navigation = () => {
     const router = useRouter();
 
     const NAV_ITEMS = [
-        { href: "/dashboard", icon: "home", label: "Home" },
-        { href: "/calendar", icon: "calendar", label: "Calendar" },
-        { href: "/boards", icon: "note", label: "Boards" },
-        { href: "/habits", icon: "user", label: "Habits" },
+        { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+        { href: "/calendar", icon: Calendar, label: "Calendar" },
+        { href: "/boards", icon: Kanban, label: "Boards" },
+        { href: "/habits", icon: CheckSquare, label: "Habits" },
     ];
 
     const handleLogout = async () => {
@@ -28,7 +35,7 @@ export const Navigation = () => {
     };
 
     const W = 1170;
-    const H = 76;
+    const H = 70;
     const R = H / 2;
     const fabD = 80;
     const fabR = fabD / 2;
@@ -78,6 +85,7 @@ export const Navigation = () => {
             <nav className={styles.navbar}>
                 {NAV_ITEMS.map((item, index) => {
                     const isActive = pathname === item.href;
+                    const Icon = item.icon;
 
                     return (
                         <div
@@ -96,12 +104,8 @@ export const Navigation = () => {
                                 href={item.href}
                                 className={`${styles.item} ${isActive ? styles.active : ""}`}
                             >
-                                <Icon
-                                    name={item.icon}
-                                    className={styles.icon}
-                                    size={30}
-                                />
-                                {item.label}
+                                <Icon size={18} className={styles.icon} />
+                                <span>{item.label}</span>
                             </Link>
                         </div>
                     );
@@ -112,16 +116,21 @@ export const Navigation = () => {
                 className={styles.fab}
                 aria-label="Add item"
             >
-                <Icon name="add" size={24} />
+                <Plus size={24} />
             </button>
             <button className={styles.button} onClick={handleLogout}>
+                <LogOut />
                 Logout
             </button>
             {modalOpen && (
                 <Modal onClose={() => setModalOpen(false)}>
-                    <CreateForm onSuccess={() => setModalOpen(false)} />
+                    <CreateForm
+                        onSuccess={() => setModalOpen(false)}
+                        onCancel={() => setModalOpen(false)}
+                    />
                 </Modal>
             )}
         </div>
     );
 };
+

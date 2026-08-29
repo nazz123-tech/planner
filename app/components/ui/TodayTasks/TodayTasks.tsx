@@ -1,7 +1,6 @@
 import { Task } from "@/app/types/task";
 import styles from "./TodayTasks.module.css";
 
-import { EmptyTask } from "../Empty/EmptyTask/EmptyTask";
 import { useToggleTaskDone } from "@/app/hooks/tasks/useToggleDone";
 interface TodayTasksProps {
     tasks: Task[];
@@ -18,7 +17,7 @@ export const TodayTasks = ({ tasks, onCreate }: TodayTasksProps) => {
                             01 / Today tasks
                         </span>
                     )}
-                    {tasks.length > 0 ? (
+                    {tasks.length > 0 &&
                         tasks.map((task) => (
                             <li className={styles.item} key={task.id}>
                                 <div className={styles.field}>
@@ -39,12 +38,10 @@ export const TodayTasks = ({ tasks, onCreate }: TodayTasksProps) => {
 
                                 <p className={styles.time}>{task.time}</p>
                             </li>
-                        ))
-                    ) : (
-                        <EmptyTask onCreate={onCreate} />
-                    )}
+                        ))}
                 </ul>
             </div>
         </div>
     );
 };
+

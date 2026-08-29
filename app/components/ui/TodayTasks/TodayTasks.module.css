@@ -1,17 +1,17 @@
 
 .tasks{
-    width: 1170px;
+    width: 100%;
     
 }
 .sectionLabel{
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 500;
     padding-left: 14px;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
     
 }
-.header{
-    margin-bottom: 10PX;
-}
+
 
 .item{
     display: flex;
@@ -19,7 +19,7 @@
     align-items: center;
     height: 40px;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 25px 20px;
     
 }
 

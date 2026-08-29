@@ -1,3 +1,4 @@
+import { Bowlby_One } from "next/font/google";
 import styles from "./BoardCard.module.css";
 interface BoardCardProps {
     id: string;
@@ -28,14 +29,20 @@ export const BoardCard = (board: BoardCardProps) => {
 
             <div className={styles.info}>
                 <h2 className={styles.cardName}>{board.name}</h2>
-                <p className={styles.subtext}>
-                    {board.taskDoneCount} of {board.taskCount} tasks
-                </p>
-                {board.noteCount > 0 && (
-                    <p className={styles.subtext}>● {board.noteCount}</p>
-                )}
+                <div className={styles.textBlock}>
+                    <p className={styles.subtext}>
+                        {board.taskDoneCount} of {board.taskCount} tasks
+                    </p>
+                    {board.noteCount > 0 && (
+                        <p className={styles.subtext}>
+                            ● {board.noteCount}{" "}
+                            {board.noteCount > 1 ? "notes" : "note"}
+                        </p>
+                    )}
+                </div>
             </div>
             <progress className={styles.progress} value={board.progress} />
         </div>
     );
 };
+

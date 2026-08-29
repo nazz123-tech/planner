@@ -5,3 +5,8 @@
     flex-direction: column;
     gap:30px;
 }
+.grid{
+    display: grid;
+        grid-template-columns: 30% 35% 35%;
+        gap: 20px;
+}

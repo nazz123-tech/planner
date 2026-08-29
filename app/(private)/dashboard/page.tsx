@@ -7,6 +7,7 @@ import { TodayTasks } from "@/app/components/ui/TodayTasks/TodayTasks";
 import Modal from "@/app/components/ui/Modal/Modal";
 import { useState } from "react";
 import { CreateForm } from "@/app/components/forms/CreateForm/CreateForm";
+import { BoardInfo } from "@/app/components/ui/BoardInfo/BoardInfo";
 
 export default function Dashboard() {
     const { tasks, totalTasks, done, isLoading } = useTodayTasks();
@@ -21,18 +22,25 @@ export default function Dashboard() {
                 done={done}
                 isLoading={isLoading}
             />
-            <TodayTasks
-                onCreate={() => {
-                    setModalOpen(true);
-                }}
-                tasks={tasks}
-                onDone={() => <></>}
-            />
+            <div className={styles.grid}>
+                <TodayTasks
+                    onCreate={() => {
+                        setModalOpen(true);
+                    }}
+                    tasks={tasks}
+                />
+                <BoardInfo />
+            </div>
+
             {modalOpen && (
                 <Modal onClose={() => setModalOpen(false)}>
-                    <CreateForm onSuccess={() => setModalOpen(false)} />
+                    <CreateForm
+                        onSuccess={() => setModalOpen(false)}
+                        onCancel={() => setModalOpen(false)}
+                    />
                 </Modal>
             )}
         </div>
     );
 }
+

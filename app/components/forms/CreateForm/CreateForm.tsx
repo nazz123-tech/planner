@@ -1,45 +1,61 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { createFormSchema } from "../schemas";
+import { createFormSchema, type CreateFormData } from "../schemas";
 import { useCreateTask } from "@/app/hooks/tasks/useCreateTask";
 import { useCreateNote } from "@/app/hooks/notes/useCreateNote";
 import styles from "./CreateForm.module.css";
+import { useCategories } from "@/app/hooks/categories/useCategories";
+import { CategoryPicker } from "../../ui/pickers/CategoryPicker/CategoryPicker";
+import { getFormattedDate, getFormattedTime } from "@/app/shared/constants";
+import toast from "react-hot-toast";
 
 type FormType = "task" | "note";
 
-interface CreateFormData {
-    title: string;
-    description?: string;
-    date?: string;
-    time?: string;
-    categoryId?: string;
-}
-
 interface CreateFormProps {
     onSuccess: () => void;
+    onCancel: () => void;
 }
 
-export const CreateForm = ({ onSuccess }: CreateFormProps) => {
+export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
     const [formType, setFormType] = useState<FormType>("task");
 
     const { mutateAsync: createTask } = useCreateTask();
     const { mutateAsync: createNote } = useCreateNote();
+    const { data: categories } = useCategories();
 
     const {
         register,
         handleSubmit,
         reset,
+        control,
         formState: { errors, isSubmitting },
     } = useForm<CreateFormData>({
         resolver: yupResolver(createFormSchema),
+        shouldUnregister: true,
+        defaultValues: {
+            title: "",
+            description: "",
+            categoryId: "",
+            date: getFormattedDate(),
+            time: getFormattedTime(),
+        },
     });
 
     const handleTypeChange = (type: FormType) => {
         setFormType(type);
-        reset();
+        reset(
+            {
+                title: "",
+                description: "",
+                categoryId: "",
+                date: getFormattedDate(),
+                time: getFormattedTime(),
+            },
+            { keepErrors: false },
+        );
     };
 
     const onSubmit = async (data: CreateFormData) => {
@@ -48,22 +64,24 @@ export const CreateForm = ({ onSuccess }: CreateFormProps) => {
                 await createTask({
                     title: data.title,
                     description: data.description,
-                    date: data.date!,
-                    time: data.time,
-                    categoryId: data.categoryId,
+                    date: data.date ?? getFormattedDate(),
+                    time: data.time ?? undefined,
+                    categoryId: data.categoryId || undefined,
                     isDone: false,
                 });
+                toast.success("Task created succesfully");
             } else {
                 await createNote({
                     title: data.title,
                     description: data.description,
-                    categoryId: data.categoryId,
+                    categoryId: data.categoryId || undefined,
                 });
+                toast.success("Note created succesfully");
             }
             reset();
             onSuccess();
         } catch (error) {
-            console.error("Failed to create:", error);
+            toast.error("Something went wrong");
         }
     };
 
@@ -102,23 +120,35 @@ export const CreateForm = ({ onSuccess }: CreateFormProps) => {
                         <p className={styles.error}>{errors.title.message}</p>
                     )}
                 </div>
+
                 <div className={styles.field}>
                     <label className={styles.label}>CATEGORY</label>
-                    <select {...register("categoryId")}>
-                        <option value="">Select Category</option>
-                        <option value="1">Work</option>
-                        <option value="2">Personal</option>
-                    </select>
+                    <Controller
+                        defaultValue=""
+                        name="categoryId"
+                        control={control}
+                        render={({ field }) => (
+                            <CategoryPicker
+                                categories={categories ?? []}
+                                value={field.value}
+                                onChange={field.onChange}
+                            />
+                        )}
+                    />
                     {errors.categoryId && (
                         <p className={styles.error}>
                             {errors.categoryId.message}
                         </p>
                     )}
                 </div>
+
                 <div className={styles.field}>
                     <label className={styles.label}>DESCRIPTION</label>
                     <textarea
                         className={styles.text}
+                        style={{
+                            height: formType === "note" ? "240px" : "",
+                        }}
                         {...register("description")}
                         placeholder="Description..."
                     />
@@ -161,14 +191,27 @@ export const CreateForm = ({ onSuccess }: CreateFormProps) => {
                     </div>
                 )}
 
-                <button
-                    className={styles.subBtn}
-                    type="submit"
-                    disabled={isSubmitting}
-                >
-                    {formType === "task" ? "Create Task" : "Create Note"}
-                </button>
+                <div className={styles.groupBtn}>
+                    <button
+                        className={styles.cancelBtn}
+                        onClick={() => {
+                            onCancel();
+                            reset();
+                        }}
+                        type="button"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className={styles.submitBtn}
+                        type="submit"
+                        disabled={isSubmitting}
+                    >
+                        {formType === "task" ? "Create Task" : "Create Note"}
+                    </button>
+                </div>
             </form>
         </div>
     );
 };
+

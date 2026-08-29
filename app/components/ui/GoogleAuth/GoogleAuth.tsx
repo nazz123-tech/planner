@@ -2,7 +2,8 @@
 import { signInWithGoogle } from "@/app/lib/auth";
 import styles from "./GoogleAuth.module.css";
 import { useRouter } from "next/navigation";
-import Icon from "../Icon/Icon";
+import { FcGoogle } from "react-icons/fc";
+import { px } from "framer-motion";
 
 export const GoogleAuth = () => {
     const router = useRouter();
@@ -18,8 +19,7 @@ export const GoogleAuth = () => {
 
     return (
         <button className={styles.button} type="button" onClick={handleClick}>
-            <Icon name="google" className={styles.icon} size={24} />
-            Sign in using Google
+            <FcGoogle width={20} height={30} /> Sign in using Google
         </button>
     );
 };

@@ -6,6 +6,7 @@ import { signUp } from "@/app/lib/auth";
 import { useRouter } from "next/navigation";
 import { GoogleAuth } from "../../ui/GoogleAuth/GoogleAuth";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import styles from "./RegisterForm.module.css";
 import Link from "next/link";
 export interface RegisterFormData {
@@ -90,7 +91,7 @@ export const RegisterForm = () => {
                             onClick={() => setIsVisible((prev) => !prev)}
                             className={styles.showPass}
                         >
-                            {isVisible ? <p>Hide</p> : <p>Show</p>}
+                            {isVisible ? <Eye /> : <EyeOff />}
                         </button>
                     </div>
 

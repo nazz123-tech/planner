@@ -1,0 +1,24 @@
+/* ColorPicker.module.css */
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.swatch:hover {
+    transform: scale(1.1);
+}
+
+.active {
+    border-color: var(--primary, #2c4a3e);
+    box-shadow: 0 0 0 2px var(--background, #e4d6b4);
+}

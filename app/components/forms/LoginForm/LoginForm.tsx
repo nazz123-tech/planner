@@ -1,6 +1,8 @@
 "use client";
 import { useForm } from "react-hook-form";
+import { LogIn } from "lucide-react";
 import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 import { loginSchema } from "../schemas";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signInWithEmail } from "@/app/lib/auth";
@@ -78,7 +80,7 @@ export const LoginForm = () => {
                             className={styles.showPass}
                             type="button"
                         >
-                            {isVisible ? <p>Hide</p> : <p>Show</p>}
+                            {isVisible ? <Eye /> : <EyeOff />}
                         </button>
                     </div>
 
@@ -94,6 +96,7 @@ export const LoginForm = () => {
 
                 <div className={styles.buttonsGroup}>
                     <button className={styles.signIn} type="submit">
+                        <LogIn />
                         Sign In
                     </button>
                     <span className={styles.line} />

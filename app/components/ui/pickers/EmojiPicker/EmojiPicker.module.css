@@ -7,8 +7,7 @@
     width: 48px;
     height: 48px;
     border-radius: 14px;
-    border: 1px solid var(--border, #e2e2e2);
-    background: var(--surface-1, #fff);
+    border: 1px solid var(--border);
     font-size: 22px;
     display: flex;
     align-items: center;
@@ -21,19 +20,13 @@
 }
 
 .grid {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    z-index: 20;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: auto auto auto;
     gap: 4px;
-    padding: 10px;
+    background-color: none;
     border-radius: 16px;
-    border: 1px solid var(--border, #e2e2e2);
-    background: var(--surface-2, #fff);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    width: 240px;
+    width: 100%;
 }
 
 .option {
@@ -48,11 +41,33 @@
     align-items: center;
     justify-content: center;
 }
-
-.option:hover {
-    background: var(--surface-3, #f2f2f2);
+.option:hover{
+    background-color: var(--background);
 }
 
+
+
 .active {
-    background: var(--fill-primary-soft, #e5e5e5);
+    background: var(--background) ;
+    border: 1px solid var(--accent);
+    pointer-events: none;
+}
+
+
+.previewTrigger {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: var(--background);
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin: 0 auto;
+    transition: border-color 0.18s ease;
+}
+
+.previewEmoji {
+    font-size: 26px;
 }
