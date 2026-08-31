@@ -42,7 +42,6 @@
     flex-direction: row;
     gap: 10px;
     align-items: center;
-    padding-left: 35px;
     cursor: pointer;
 }
 
@@ -55,10 +54,8 @@
 }
 
 .checkmark {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
+    position: relative;
+    flex-shrink: 0;
     height: 22px;
     width: 22px;
     border-radius: 6px;

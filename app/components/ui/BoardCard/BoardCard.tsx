@@ -1,4 +1,5 @@
 "use client";
+import { motion } from "framer-motion";
 import { Trash, ListChecks, TextAlignStart } from "lucide-react";
 import { useDeleteCategory } from "@/app/hooks/categories/useDeleteCategory";
 import styles from "./BoardCard.module.css";
@@ -63,7 +64,22 @@ export const BoardCard = (board: BoardCardProps) => {
                     )}
                 </div>
             </div>
-            <progress className={styles.progress} value={board.progress} />
+            <div className={styles.progressTrack}>
+                <motion.div
+                    className={styles.progressFill}
+                    initial={{ width: "0%" }}
+                    animate={{
+                        width: `${Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                Math.round((board.progress ?? 0) * 100),
+                            ),
+                        )}%`,
+                    }}
+                    transition={{ type: "spring", stiffness: 180, damping: 24 }}
+                />
+            </div>
         </div>
     );
 };

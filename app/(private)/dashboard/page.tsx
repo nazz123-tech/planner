@@ -32,14 +32,12 @@ export default function Dashboard() {
                 <BoardInfo />
             </div>
 
-            {modalOpen && (
-                <Modal onClose={() => setModalOpen(false)}>
-                    <CreateForm
-                        onSuccess={() => setModalOpen(false)}
-                        onCancel={() => setModalOpen(false)}
-                    />
-                </Modal>
-            )}
+            <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+                <CreateForm
+                    onSuccess={() => setModalOpen(false)}
+                    onCancel={() => setModalOpen(false)}
+                />
+            </Modal>
         </div>
     );
 }

@@ -32,14 +32,16 @@
 }
 
 
-.fabSpacer {
+.fabSlot {
+    position: relative;
+    align-self: stretch;
     width: 80px;
-    flex-shrink: 1;
+    flex-shrink: 0;
 }
 
 .fab {
     position: absolute;
-    top: 85px;
+    top: calc(50% + 47px);
     left: 50%;
     transform: translate(-50%, -50%) scale(1);
     width: 56px;

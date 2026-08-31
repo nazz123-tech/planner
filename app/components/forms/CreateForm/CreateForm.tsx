@@ -161,25 +161,24 @@ export const CreateForm = ({
                                     + Create category
                                 </button>
 
-                                {categoryModalOpen && (
-                                    <Modal
-                                        onClose={() =>
+                                <Modal
+                                    open={categoryModalOpen}
+                                    onClose={() =>
+                                        setCategoryModalOpen(false)
+                                    }
+                                >
+                                    <BoardForm
+                                        onCreated={(id) =>
+                                            field.onChange(id)
+                                        }
+                                        onSuccess={() =>
                                             setCategoryModalOpen(false)
                                         }
-                                    >
-                                        <BoardForm
-                                            onCreated={(id) =>
-                                                field.onChange(id)
-                                            }
-                                            onSuccess={() =>
-                                                setCategoryModalOpen(false)
-                                            }
-                                            onCancel={() =>
-                                                setCategoryModalOpen(false)
-                                            }
-                                        />
-                                    </Modal>
-                                )}
+                                        onCancel={() =>
+                                            setCategoryModalOpen(false)
+                                        }
+                                    />
+                                </Modal>
                             </>
                         )}
                     />

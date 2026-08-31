@@ -192,6 +192,12 @@
     color: var(--text-primary);
 }
 
+.gridWrap {
+    position: relative;
+    overflow: hidden;
+    width: 1170px;
+}
+
 .grid {
     padding: 1rem 1.25rem 0;
     width: 1170px;

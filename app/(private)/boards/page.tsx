@@ -31,14 +31,12 @@ export default function Boards() {
                     <BoardCard key={board.id} {...board} />
                 ))}
             </div>
-            {modalOpen && (
-                <Modal onClose={() => setModalOpen(false)}>
-                    <BoardForm
-                        onCancel={() => setModalOpen(false)}
-                        onSuccess={() => setModalOpen(false)}
-                    />
-                </Modal>
-            )}
+            <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+                <BoardForm
+                    onCancel={() => setModalOpen(false)}
+                    onSuccess={() => setModalOpen(false)}
+                />
+            </Modal>
         </div>
     );
 }

@@ -26,6 +26,14 @@ export default function CalendarPage() {
         type: "task" | "note";
     } | null>(null);
 
+    // Keep the last opened values around so modal content stays rendered
+    // while the modal plays its exit animation after being closed.
+    const [detailsView, setDetailsView] = useState<string | null>(null);
+    if (detailsDate && detailsDate !== detailsView) setDetailsView(detailsDate);
+
+    const [createView, setCreateView] = useState<typeof createModal>(null);
+    if (createModal && createModal !== createView) setCreateView(createModal);
+
     return (
         <div className={styles.container}>
             <ContinuousCalendar
@@ -48,36 +56,39 @@ export default function CalendarPage() {
                 }}
             />
 
-            {detailsDate && (
-                <Modal onClose={() => setDetailsDate(null)}>
+            <Modal
+                open={!!detailsDate}
+                onClose={() => setDetailsDate(null)}
+            >
+                {detailsView && (
                     <DayDetails
-                        date={detailsDate}
+                        date={detailsView}
                         tasks={tasks ?? []}
                         notes={notes ?? []}
                         categories={categories ?? []}
                         onAdd={() => {
-                            setCreateModal({ date: detailsDate, type: "task" });
+                            setCreateModal({ date: detailsView, type: "task" });
                             setDetailsDate(null);
                         }}
                         onAddNote={() => {
-                            setCreateModal({ date: detailsDate, type: "note" });
+                            setCreateModal({ date: detailsView, type: "note" });
                             setDetailsDate(null);
                         }}
                     />
-                </Modal>
-            )}
+                )}
+            </Modal>
 
-            {createModal && (
-                <Modal onClose={() => setCreateModal(null)}>
+            <Modal open={!!createModal} onClose={() => setCreateModal(null)}>
+                {createView && (
                     <CreateForm
-                        defaultDate={createModal.date}
-                        defaultType={createModal.type}
+                        defaultDate={createView.date}
+                        defaultType={createView.type}
                         lockDate
                         onSuccess={() => setCreateModal(null)}
                         onCancel={() => setCreateModal(null)}
                     />
-                </Modal>
-            )}
+                )}
+            </Modal>
         </div>
     );
 }
