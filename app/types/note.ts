@@ -3,4 +3,6 @@ export interface Note {
     title: string;
     description?: string;
     categoryId?: string;
+    date: string;
+    createdAt?: { seconds: number; nanoseconds: number };
 }

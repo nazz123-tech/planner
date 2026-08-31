@@ -36,55 +36,145 @@
 
 .selectWrapper {
     position: relative;
+    display: inline-flex;
 }
 
 .select {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 150px;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 9999px;
+    border: 1px solid var(--border);
+    background: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    outline: none;
     cursor: pointer;
-    border-radius: 12px;
-    border: 1px solid var(--border, #e2e2e2);
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.select:hover,
+.select:focus-visible {
+    border-color: var(--accent);
+}
+
+.selectChevron {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--text-secondary);
+    border-bottom: 2px solid var(--text-secondary);
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.15s ease;
+}
+
+.selectChevronOpen {
+    transform: translateY(2px) rotate(225deg);
+}
+
+.selectMenu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 60;
+    min-width: 100%;
+    max-height: 264px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    list-style: none;
+    margin: 0;
+    padding: 6px;
     background: var(--card-background);
-    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(34, 48, 31, 0.16);
+}
+
+.selectMenu::-webkit-scrollbar {
+    display: none;
+}
+
+.selectOption {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-family: var(--font-main);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.selectOption:hover {
+    background: var(--background-deep);
+}
+
+.selectOptionActive,
+.selectOptionActive:hover {
+    background: var(--primary);
+    color: var(--text-on-primary);
 }
 
 .todayButton {
-    border-radius: 12px;
-    border: 1px solid var(--border, #e2e2e2);
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
+    border-radius: 9999px;
+    border: none;
+    background: var(--primary);
+    color: var(--text-on-primary);
+    padding: 0 24px;
+    height: 44px;
+    font-family: var(--font-main);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     cursor: pointer;
+    transition: background 0.2s ease;
 }
 
 .todayButton:hover {
-    background: var(--surface-3, #f2f2f2);
+    background: var(--accent);
 }
 
 .yearControls {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 .yearButton {
     border-radius: 50%;
-    border: 1px solid var(--border, #e2e2e2);
-    padding: 6px;
-    background: transparent;
+    border: 1px solid var(--border);
+    padding: 8px;
+    background: var(--background);
+    color: var(--text-primary);
     cursor: pointer;
     display: flex;
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .yearButton:hover {
-    background: var(--surface-3, #f2f2f2);
+    background: var(--background-deep);
+    border-color: var(--accent);
 }
 
 .yearLabel {
     min-width: 70px;
     text-align: center;
-    font-size: 18px;
+    font-family: var(--font-heading);
+    font-size: 20px;
     font-weight: 700;
+    color: var(--text-primary);
 }
 
 .weekdaysRow {
@@ -123,7 +213,8 @@
     border-radius: 14px;
     border: 1px solid var(--border, #e2e2e2);
     padding: 6px;
-    transition: border-color 0.15s ease;
+    transition: border-color 0.15s ease, background-color 0.15s ease,
+        box-shadow 0.15s ease;
     display: flex;
     flex-direction: column;
 }
@@ -131,6 +222,13 @@
 .dayCell:hover {
     z-index: 20;
     border-color: var(--accent-hover);
+}
+
+.dropTarget {
+    z-index: 25;
+    background-color: var(--background-deep);
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 2px var(--accent);
 }
 
 .dayHeader {
@@ -160,20 +258,58 @@
     color: var(--text-muted);
 }
 
+.dayHeaderRight {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.noteBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--accent-deep);
+}
+
+.noteBadgeCount {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent-deep);
+}
+
+@media (min-width: 1024px) {
+    .noteBadge svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .noteBadgeCount {
+        font-size: 13px;
+    }
+}
+
 .addButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
-    padding: 2px;
-    background: transparent;
+    padding: 3px;
+    background: var(--primary);
     border: none;
-    color: var(--text-accent);
+    color: var(--text-on-primary);
     opacity: 0;
     cursor: pointer;
-    transition: opacity 0.15s ease;
+    transition: opacity 0.15s ease, background 0.15s ease;
 }
 
 .dayCell:hover .addButton,
 .addButton:focus {
     opacity: 1;
+}
+
+.addButton:hover {
+    background: var(--accent);
 }
 
 .monthLabel {
@@ -202,6 +338,37 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    animation: pillIn 0.2s ease;
+    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.draggablePill {
+    cursor: grab;
+}
+
+.draggablePill:active {
+    cursor: grabbing;
+}
+
+.draggablePill:hover {
+    box-shadow: 0 2px 6px rgba(34, 48, 31, 0.25);
+    transform: translateY(-1px);
+}
+
+.dragging {
+    opacity: 0.4;
+    transform: scale(0.96);
+}
+
+@keyframes pillIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .moreLabel {

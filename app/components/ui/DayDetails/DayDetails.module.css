@@ -1,0 +1,227 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.kicker {
+    font-family: var(--font-main);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sectionHead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sectionTitle {
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--background-deep);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.task {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--card-background);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(34, 48, 31, 0.08);
+    transition: box-shadow 0.15s ease, transform 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.task:hover {
+    border-color: var(--accent);
+    box-shadow: 0 10px 24px rgba(34, 48, 31, 0.14);
+    transform: translateY(-1px);
+}
+
+.task[data-done="true"] {
+    box-shadow: none;
+    opacity: 0.7;
+}
+
+.task[data-done="true"] .itemTitle {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.dot {
+    flex-shrink: 0;
+    margin-top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(122, 123, 74, 0.15);
+}
+
+.body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.itemTitle {
+    font-family: var(--font-secondary);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.itemDesc {
+    font-family: var(--font-secondary);
+    font-size: 12px;
+    color: var(--text-secondary);
+    word-break: break-word;
+}
+
+.meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.tag {
+    align-self: flex-start;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--text-on-primary);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.tagNote {
+    background: var(--primary);
+}
+
+.done {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--primary);
+}
+
+.time {
+    flex-shrink: 0;
+    font-family: var(--font-main);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.note {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.empty {
+    padding: 4px 0;
+    font-family: var(--font-secondary);
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.addRow {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.addBtn,
+.addNoteBtn {
+    flex: 1;
+    height: 46px;
+    border-radius: 999px;
+    font-family: var(--font-main);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 200ms ease, color 200ms ease;
+}
+
+.addBtn {
+    border: none;
+    background: var(--primary);
+    color: var(--text-on-primary);
+}
+
+.addBtn:hover {
+    background: var(--accent);
+}
+
+.addNoteBtn {
+    border: none;
+    background: var(--accent);
+    color: var(--text-on-primary);
+}
+
+.addNoteBtn:hover {
+    background: var(--accent-deep);
+}

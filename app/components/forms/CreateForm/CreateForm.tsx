@@ -9,6 +9,8 @@ import { useCreateNote } from "@/app/hooks/notes/useCreateNote";
 import styles from "./CreateForm.module.css";
 import { useCategories } from "@/app/hooks/categories/useCategories";
 import { CategoryPicker } from "../../ui/pickers/CategoryPicker/CategoryPicker";
+import Modal from "../../ui/Modal/Modal";
+import { BoardForm } from "../BoardForm/BoardForm";
 import { getFormattedDate, getFormattedTime } from "@/app/shared/constants";
 import toast from "react-hot-toast";
 
@@ -17,10 +19,21 @@ type FormType = "task" | "note";
 interface CreateFormProps {
     onSuccess: () => void;
     onCancel: () => void;
+    defaultDate?: string;
+    lockDate?: boolean;
+    defaultType?: FormType;
 }
 
-export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
-    const [formType, setFormType] = useState<FormType>("task");
+export const CreateForm = ({
+    onSuccess,
+    onCancel,
+    defaultDate,
+    lockDate = false,
+    defaultType = "task",
+}: CreateFormProps) => {
+    const [formType, setFormType] = useState<FormType>(defaultType);
+
+    const [categoryModalOpen, setCategoryModalOpen] = useState(false);
 
     const { mutateAsync: createTask } = useCreateTask();
     const { mutateAsync: createNote } = useCreateNote();
@@ -39,7 +52,7 @@ export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
             title: "",
             description: "",
             categoryId: "",
-            date: getFormattedDate(),
+            date: defaultDate ?? getFormattedDate(),
             time: "12:30",
         },
     });
@@ -51,7 +64,7 @@ export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
                 title: "",
                 description: "",
                 categoryId: "",
-                date: getFormattedDate(),
+                date: defaultDate ?? getFormattedDate(),
                 time: getFormattedTime(),
             },
             { keepErrors: false },
@@ -64,7 +77,7 @@ export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
                 await createTask({
                     title: data.title,
                     description: data.description,
-                    date: data.date ?? getFormattedDate(),
+                    date: data.date ?? defaultDate ?? getFormattedDate(),
                     time: data.time ?? undefined,
                     categoryId: data.categoryId || undefined,
                     isDone: false,
@@ -75,6 +88,7 @@ export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
                     title: data.title,
                     description: data.description,
                     categoryId: data.categoryId || undefined,
+                    date: defaultDate ?? getFormattedDate(),
                 });
                 toast.success("Note created succesfully");
             }
@@ -87,22 +101,27 @@ export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.switcher}>
-                <button
-                    className={`${styles.switchBtn} ${formType === "task" ? styles.active : ""}`}
-                    type="button"
-                    onClick={() => handleTypeChange("task")}
-                >
-                    Task
-                </button>
-                <button
-                    className={`${styles.switchBtn} ${formType === "note" ? styles.active : ""}`}
-                    type="button"
-                    onClick={() => handleTypeChange("note")}
-                >
-                    Note
-                </button>
-            </div>
+            <h2 className={styles.heading}>
+                {formType === "task" ? "New Task" : "New Note"}
+            </h2>
+            {!lockDate && (
+                <div className={styles.switcher}>
+                    <button
+                        className={`${styles.switchBtn} ${formType === "task" ? styles.active : ""}`}
+                        type="button"
+                        onClick={() => handleTypeChange("task")}
+                    >
+                        Task
+                    </button>
+                    <button
+                        className={`${styles.switchBtn} ${formType === "note" ? styles.active : ""}`}
+                        type="button"
+                        onClick={() => handleTypeChange("note")}
+                    >
+                        Note
+                    </button>
+                </div>
+            )}
 
             <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
                 <div className={styles.field}>
@@ -128,11 +147,40 @@ export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
                         name="categoryId"
                         control={control}
                         render={({ field }) => (
-                            <CategoryPicker
-                                categories={categories ?? []}
-                                value={field.value}
-                                onChange={field.onChange}
-                            />
+                            <>
+                                <CategoryPicker
+                                    categories={categories ?? []}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                />
+                                <button
+                                    type="button"
+                                    className={styles.newCategoryToggle}
+                                    onClick={() => setCategoryModalOpen(true)}
+                                >
+                                    + Create category
+                                </button>
+
+                                {categoryModalOpen && (
+                                    <Modal
+                                        onClose={() =>
+                                            setCategoryModalOpen(false)
+                                        }
+                                    >
+                                        <BoardForm
+                                            onCreated={(id) =>
+                                                field.onChange(id)
+                                            }
+                                            onSuccess={() =>
+                                                setCategoryModalOpen(false)
+                                            }
+                                            onCancel={() =>
+                                                setCategoryModalOpen(false)
+                                            }
+                                        />
+                                    </Modal>
+                                )}
+                            </>
                         )}
                     />
                     {errors.categoryId && (
@@ -167,7 +215,13 @@ export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
                                 className={styles.input}
                                 {...register("date")}
                                 type="date"
+                                disabled={lockDate}
                             />
+                            {lockDate && (
+                                <span className={styles.hint}>
+                                    Fixed to the selected day
+                                </span>
+                            )}
                             {errors.date && (
                                 <p className={styles.error}>
                                     {errors.date.message}
