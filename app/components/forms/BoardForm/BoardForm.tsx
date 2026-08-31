@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 interface BoardFormProps {
     onSuccess: () => void;
     onCancel: () => void;
+    onCreated?: (categoryId: string) => void;
 }
 
 interface BoardFormData {
@@ -23,8 +24,12 @@ interface BoardFormData {
     color?: string;
 }
 
-export const BoardForm = ({ onSuccess, onCancel }: BoardFormProps) => {
-    const { mutate: createCategory } = useCreateCategory();
+export const BoardForm = ({
+    onSuccess,
+    onCancel,
+    onCreated,
+}: BoardFormProps) => {
+    const { mutateAsync: createCategory } = useCreateCategory();
 
     const {
         register,
@@ -37,10 +42,15 @@ export const BoardForm = ({ onSuccess, onCancel }: BoardFormProps) => {
     });
 
     const onSubmit = async (data: BoardFormData) => {
-        createCategory(data);
-        reset();
-        onSuccess();
-        toast.success("New category created");
+        try {
+            const ref = await createCategory(data);
+            onCreated?.(ref.id);
+            reset();
+            onSuccess();
+            toast.success("New category created");
+        } catch {
+            toast.error("Something went wrong");
+        }
     };
 
     return (

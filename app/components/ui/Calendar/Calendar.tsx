@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Calendar.module.css";
 import type { Task } from "@/app/types/task";
+import type { Note } from "@/app/types/note";
 import type { Category } from "@/app/types/category";
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -24,8 +25,10 @@ const monthNames = [
 interface ContinuousCalendarProps {
     tasks: Task[];
     categories: Category[];
+    notes?: Note[];
     onClick?: (day: number, month: number, year: number) => void;
     onAddClick?: (day: number, month: number, year: number) => void;
+    onTaskMove?: (taskId: string, date: string) => void;
 }
 
 function toDateKey(day: number, month: number, year: number): string {
@@ -35,14 +38,18 @@ function toDateKey(day: number, month: number, year: number): string {
 export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
     tasks,
     categories,
+    notes = [],
     onClick,
     onAddClick,
+    onTaskMove,
 }) => {
     const today = new Date();
     const containerRef = useRef<HTMLDivElement | null>(null);
     const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [year, setYear] = useState<number>(new Date().getFullYear());
     const [selectedMonth, setSelectedMonth] = useState<number>(0);
+    const [dragTaskId, setDragTaskId] = useState<string | null>(null);
+    const [dragOverKey, setDragOverKey] = useState<string | null>(null);
 
     const pendingScrollTargetRef = useRef<{
         month: number;
@@ -62,6 +69,15 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         }
         return map;
     }, [tasks]);
+
+    const noteCountByDate = useMemo(() => {
+        const map = new Map<string, number>();
+        for (const note of notes) {
+            if (!note.date) continue;
+            map.set(note.date, (map.get(note.date) ?? 0) + 1);
+        }
+        return map;
+    }, [notes]);
 
     const categoryColorById = useMemo(() => {
         const map = new Map<string, string>();
@@ -112,8 +128,8 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
     const handlePrevYear = () => setYear((prevYear) => prevYear - 1);
     const handleNextYear = () => setYear((prevYear) => prevYear + 1);
 
-    const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const monthIndex = parseInt(event.target.value, 10);
+    const handleMonthChange = (value: string) => {
+        const monthIndex = parseInt(value, 10);
         setSelectedMonth(monthIndex);
 
         pendingScrollTargetRef.current = { month: monthIndex, day: 1 };
@@ -159,6 +175,41 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
     ) => {
         e.stopPropagation();
         onAddClick?.(day, month, year);
+    };
+
+    const handleTaskDragStart = (
+        e: React.DragEvent<HTMLDivElement>,
+        taskId: string,
+    ) => {
+        e.dataTransfer.setData("text/plain", taskId);
+        e.dataTransfer.effectAllowed = "move";
+        setDragTaskId(taskId);
+    };
+
+    const handleTaskDragEnd = () => {
+        setDragTaskId(null);
+        setDragOverKey(null);
+    };
+
+    const handleDayDragOver = (
+        e: React.DragEvent<HTMLDivElement>,
+        dateKey: string,
+    ) => {
+        if (!dragTaskId) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (dragOverKey !== dateKey) setDragOverKey(dateKey);
+    };
+
+    const handleDayDrop = (
+        e: React.DragEvent<HTMLDivElement>,
+        dateKey: string,
+    ) => {
+        e.preventDefault();
+        const taskId = e.dataTransfer.getData("text/plain") || dragTaskId;
+        setDragTaskId(null);
+        setDragOverKey(null);
+        if (taskId) onTaskMove?.(taskId, dateKey);
     };
 
     const generateCalendar = useMemo(() => {
@@ -221,6 +272,14 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                         : [];
                     const visibleTasks = dayTasks.slice(0, 3);
                     const hiddenCount = dayTasks.length - visibleTasks.length;
+                    const noteCount = dateKey
+                        ? (noteCountByDate.get(dateKey) ?? 0)
+                        : 0;
+
+                    const isDropTarget =
+                        !!dragTaskId &&
+                        !isOutsideMonth &&
+                        dragOverKey === dateKey;
 
                     return (
                         <div
@@ -231,7 +290,17 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                             data-month={month}
                             data-day={day}
                             onClick={() => handleDayClick(day, month, year)}
-                            className={styles.dayCell}
+                            onDragOver={
+                                onTaskMove && !isOutsideMonth && dateKey
+                                    ? (e) => handleDayDragOver(e, dateKey)
+                                    : undefined
+                            }
+                            onDrop={
+                                onTaskMove && !isOutsideMonth && dateKey
+                                    ? (e) => handleDayDrop(e, dateKey)
+                                    : undefined
+                            }
+                            className={`${styles.dayCell} ${isDropTarget ? styles.dropTarget : ""}`}
                         >
                             <div className={styles.dayHeader}>
                                 <span
@@ -239,30 +308,78 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                 >
                                     {day}
                                 </span>
-                                {onAddClick && !isOutsideMonth && (
-                                    <button
-                                        type="button"
-                                        className={styles.addButton}
-                                        onClick={(e) =>
-                                            handleAddClick(e, day, month, year)
-                                        }
-                                        aria-label="Додати задачу"
-                                    >
-                                        <svg
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            width="16"
-                                            height="16"
+                                <div className={styles.dayHeaderRight}>
+                                    {noteCount > 0 && (
+                                        <span
+                                            className={styles.noteBadge}
+                                            title={`${noteCount} note${noteCount > 1 ? "s" : ""}`}
+                                            aria-label={`${noteCount} note${noteCount > 1 ? "s" : ""}`}
                                         >
-                                            <path
-                                                d="M12 5v14M5 12h14"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                            />
-                                        </svg>
-                                    </button>
-                                )}
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                width="18"
+                                                height="18"
+                                                fill="none"
+                                            >
+                                                <path
+                                                    d="M4 4h16v10l-6 6H4z"
+                                                    fill="currentColor"
+                                                    opacity="0.2"
+                                                />
+                                                <path
+                                                    d="M4 4h16v10l-6 6H4z"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    strokeLinejoin="round"
+                                                />
+                                                <path
+                                                    d="M14 20v-6h6"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    strokeLinejoin="round"
+                                                />
+                                            </svg>
+                                            {noteCount > 1 && (
+                                                <span
+                                                    className={
+                                                        styles.noteBadgeCount
+                                                    }
+                                                >
+                                                    {noteCount}
+                                                </span>
+                                            )}
+                                        </span>
+                                    )}
+                                    {onAddClick && !isOutsideMonth && (
+                                        <button
+                                            type="button"
+                                            className={styles.addButton}
+                                            onClick={(e) =>
+                                                handleAddClick(
+                                                    e,
+                                                    day,
+                                                    month,
+                                                    year,
+                                                )
+                                            }
+                                            aria-label="Додати задачу"
+                                        >
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                width="16"
+                                                height="16"
+                                            >
+                                                <path
+                                                    d="M12 5v14M5 12h14"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    strokeLinecap="round"
+                                                />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
                             {isNewMonth && !isOutsideMonth && (
@@ -280,10 +397,35 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                                 task.categoryId,
                                             );
 
+                                        const draggable =
+                                            !!onTaskMove && !isOutsideMonth;
+
                                         return (
                                             <div
                                                 key={task.id}
-                                                className={styles.eventPill}
+                                                draggable={draggable}
+                                                onDragStart={
+                                                    draggable
+                                                        ? (e) =>
+                                                              handleTaskDragStart(
+                                                                  e,
+                                                                  task.id,
+                                                              )
+                                                        : undefined
+                                                }
+                                                onDragEnd={
+                                                    draggable
+                                                        ? handleTaskDragEnd
+                                                        : undefined
+                                                }
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                                className={`${styles.eventPill} ${
+                                                    dragTaskId === task.id
+                                                        ? styles.dragging
+                                                        : ""
+                                                } ${draggable ? styles.draggablePill : ""}`}
                                                 style={{
                                                     backgroundColor: `${color}`,
                                                 }}
@@ -304,7 +446,16 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                 })}
             </div>
         ));
-    }, [year, tasksByDate, categoryColorById, onAddClick]);
+    }, [
+        year,
+        tasksByDate,
+        categoryColorById,
+        onAddClick,
+        onTaskMove,
+        dragTaskId,
+        dragOverKey,
+        noteCountByDate,
+    ]);
 
     useEffect(() => {
         const calendarContainer = containerRef.current;
@@ -343,7 +494,6 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                 <div className={styles.headerRow}>
                     <div className={styles.controls}>
                         <Select
-                            name="month"
                             value={`${selectedMonth}`}
                             options={monthOptions}
                             onChange={handleMonthChange}
@@ -353,7 +503,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                             type="button"
                             className={styles.todayButton}
                         >
-                            Сьогодні
+                            Today
                         </button>
                     </div>
                     <div className={styles.yearControls}>
@@ -414,28 +564,79 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
 };
 
 interface SelectProps {
-    name: string;
     value: string;
     options: { name: string; value: string }[];
-    onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    onChange: (value: string) => void;
 }
 
-const Select = ({ name, value, options, onChange }: SelectProps) => (
-    <div className={styles.selectWrapper}>
-        <select
-            id={name}
-            name={name}
-            value={value}
-            onChange={onChange}
-            className={styles.select}
-            required
-        >
-            {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                    {option.name}
-                </option>
-            ))}
-        </select>
-    </div>
-);
+const Select = ({ value, options, onChange }: SelectProps) => {
+    const [open, setOpen] = useState(false);
+    const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+    const selected = options.find((option) => option.value === value);
+
+    useEffect(() => {
+        if (!open) return;
+
+        const handlePointerDown = (event: MouseEvent) => {
+            if (
+                wrapperRef.current &&
+                !wrapperRef.current.contains(event.target as Node)
+            ) {
+                setOpen(false);
+            }
+        };
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setOpen(false);
+        };
+
+        document.addEventListener("mousedown", handlePointerDown);
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+            document.removeEventListener("mousedown", handlePointerDown);
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [open]);
+
+    return (
+        <div ref={wrapperRef} className={styles.selectWrapper}>
+            <button
+                type="button"
+                className={styles.select}
+                onClick={() => setOpen((prev) => !prev)}
+                aria-haspopup="listbox"
+                aria-expanded={open}
+            >
+                <span>{selected?.name ?? ""}</span>
+                <span
+                    className={`${styles.selectChevron} ${open ? styles.selectChevronOpen : ""}`}
+                />
+            </button>
+
+            {open && (
+                <ul className={styles.selectMenu} role="listbox">
+                    {options.map((option) => {
+                        const isActive = option.value === value;
+                        return (
+                            <li key={option.value}>
+                                <button
+                                    type="button"
+                                    role="option"
+                                    aria-selected={isActive}
+                                    className={`${styles.selectOption} ${isActive ? styles.selectOptionActive : ""}`}
+                                    onClick={() => {
+                                        onChange(option.value);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    {option.name}
+                                </button>
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+        </div>
+    );
+};
 
