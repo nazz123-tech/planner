@@ -14,9 +14,6 @@ export function useCreateTask() {
                 ...task,
                 createdAt: serverTimestamp(),
             }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["tasks", user?.uid] });
-        },
     });
 }
 

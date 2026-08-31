@@ -1,5 +1,8 @@
-import { Bowlby_One } from "next/font/google";
+"use client";
+import { Trash, ListChecks, TextAlignStart } from "lucide-react";
+import { useDeleteCategory } from "@/app/hooks/categories/useDeleteCategory";
 import styles from "./BoardCard.module.css";
+import toast from "react-hot-toast";
 interface BoardCardProps {
     id: string;
     name: string;
@@ -10,6 +13,12 @@ interface BoardCardProps {
     progress: number;
 }
 export const BoardCard = (board: BoardCardProps) => {
+    const { mutate: deleteCategory } = useDeleteCategory();
+
+    const onDelete = async (boardId: string) => {
+        await deleteCategory(boardId);
+        toast.success("Category delete is completed");
+    };
     return (
         <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -18,12 +27,25 @@ export const BoardCard = (board: BoardCardProps) => {
                 </div>
                 <div className={styles.headerRight}>
                     {board.taskCount > 0 && (
-                        <div className={styles.badge}>{board.taskCount}</div>
+                        <div className={styles.badge}>
+                            <ListChecks size={12} />
+
+                            {board.taskCount}
+                        </div>
                     )}
 
                     {board.noteCount > 0 && (
-                        <div className={styles.badge}>{board.noteCount}</div>
+                        <div className={styles.badge}>
+                            <TextAlignStart size={12} />
+                            {board.noteCount}
+                        </div>
                     )}
+                    <button
+                        onClick={() => onDelete(board.id)}
+                        className={styles.deleteBtn}
+                    >
+                        <Trash size={12} />
+                    </button>
                 </div>
             </div>
 

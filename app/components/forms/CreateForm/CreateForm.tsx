@@ -40,7 +40,7 @@ export const CreateForm = ({ onSuccess, onCancel }: CreateFormProps) => {
             description: "",
             categoryId: "",
             date: getFormattedDate(),
-            time: getFormattedTime(),
+            time: "12:30",
         },
     });
 

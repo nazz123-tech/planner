@@ -20,8 +20,9 @@ export const TodayTasks = ({ tasks, onCreate }: TodayTasksProps) => {
                     {tasks.length > 0 &&
                         tasks.map((task) => (
                             <li className={styles.item} key={task.id}>
-                                <div className={styles.field}>
+                                <label className={styles.field}>
                                     <input
+                                        className={styles.input}
                                         checked={task.isDone}
                                         onChange={() =>
                                             toggleDone({
@@ -31,10 +32,10 @@ export const TodayTasks = ({ tasks, onCreate }: TodayTasksProps) => {
                                         }
                                         type="checkbox"
                                         name="status"
-                                        id=""
                                     />
-                                    <label>{task.title}</label>
-                                </div>
+                                    <span className={styles.checkmark}></span>
+                                    {task.title}
+                                </label>
 
                                 <p className={styles.time}>{task.time}</p>
                             </li>

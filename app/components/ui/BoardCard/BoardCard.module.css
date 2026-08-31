@@ -26,6 +26,11 @@
     gap:20px;
 }
 .badge{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap:2px;
     padding: 1px 10px;
     color:var(--text-muted);
     font-size: 12px;
@@ -71,4 +76,20 @@
 .card:hover{
     border-color: var(--accent-hover);
     transform: translateY(-4px);
+}
+.deleteBtn{
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background-color: transparent;
+    color: #CB3534;
+    transition: all 200ms ease;
+}
+.deleteBtn:hover{
+    background-color:#CB3534;;
+    color: white;
 }

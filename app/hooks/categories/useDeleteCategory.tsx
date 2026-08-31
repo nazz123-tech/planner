@@ -10,11 +10,6 @@ export function useDeleteCategory() {
     return useMutation({
         mutationFn: (categoryId: string) =>
             deleteDoc(doc(db, `users/${user!.uid}/categories/${categoryId}`)),
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["categories", user?.uid],
-            });
-        },
     });
 }
 
