@@ -4,14 +4,11 @@ import { db } from "@/app/lib/firebase";
 import { useAuth } from "../useAuth";
 
 export function useDeleteTask() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+    const { user } = useAuth();
 
-  return useMutation({
-    mutationFn: (taskId: string) =>
-      deleteDoc(doc(db, `users/${user!.uid}/tasks/${taskId}`)),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", user?.uid] });
-    },
-  });
+    return useMutation({
+        mutationFn: (taskId: string) =>
+            deleteDoc(doc(db, `users/${user!.uid}/tasks/${taskId}`)),
+    });
 }
+
