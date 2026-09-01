@@ -7,6 +7,7 @@ import { useCategories } from "@/app/hooks/categories/useCategories";
 import { useUpdateTask } from "@/app/hooks/tasks/useUpdateTask";
 import Modal from "@/app/components/ui/Modal/Modal";
 import { CreateForm } from "@/app/components/forms/CreateForm/CreateForm";
+import { ImportCalendarForm } from "@/app/components/forms/ImportCalendarForm/ImportCalendarForm";
 import { DayDetails } from "@/app/components/ui/DayDetails/DayDetails";
 import styles from "./page.module.css";
 
@@ -24,6 +25,7 @@ export default function CalendarPageClient() {
     const [createModal, setCreateModal] = useState<{
         date: string;
     } | null>(null);
+    const [importOpen, setImportOpen] = useState(false);
 
     // Keep the last opened values around so modal content stays rendered
     // while the modal plays its exit animation after being closed.
@@ -34,23 +36,56 @@ export default function CalendarPageClient() {
     if (createModal && createModal !== createView) setCreateView(createModal);
 
     return (
-        <div className={styles.container}>
-            <ContinuousCalendar
-                tasks={tasks ?? []}
-                categories={categories ?? []}
-                notes={notes ?? []}
-                onClick={(day, month, year) =>
-                    setDetailsDate(toDateKey(day, month, year))
-                }
-                onAddClick={(day, month, year) =>
-                    setCreateModal({ date: toDateKey(day, month, year) })
-                }
-                onTaskMove={(taskId, date) => {
-                    const task = tasks?.find((item) => item.id === taskId);
-                    if (!task || task.date === date) return;
-                    updateTask({ taskId, data: { date } });
-                }}
-            />
+        <div className={styles.page}>
+            <div className={styles.toolbar}>
+                <button
+                    type="button"
+                    className={styles.importBtn}
+                    onClick={() => setImportOpen(true)}
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M12 15V3m0 0 4 4m-4-4L8 7"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                        <path
+                            d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                    Import .ics
+                </button>
+            </div>
+
+            <div className={styles.container}>
+                <ContinuousCalendar
+                    tasks={tasks ?? []}
+                    categories={categories ?? []}
+                    notes={notes ?? []}
+                    onClick={(day, month, year) =>
+                        setDetailsDate(toDateKey(day, month, year))
+                    }
+                    onAddClick={(day, month, year) =>
+                        setCreateModal({ date: toDateKey(day, month, year) })
+                    }
+                    onTaskMove={(taskId, date) => {
+                        const task = tasks?.find((item) => item.id === taskId);
+                        if (!task || task.date === date) return;
+                        updateTask({ taskId, data: { date } });
+                    }}
+                />
+            </div>
 
             <Modal
                 open={!!detailsDate}
@@ -79,6 +114,13 @@ export default function CalendarPageClient() {
                         onCancel={() => setCreateModal(null)}
                     />
                 )}
+            </Modal>
+
+            <Modal open={importOpen} onClose={() => setImportOpen(false)}>
+                <ImportCalendarForm
+                    onSuccess={() => setImportOpen(false)}
+                    onCancel={() => setImportOpen(false)}
+                />
             </Modal>
         </div>
     );
