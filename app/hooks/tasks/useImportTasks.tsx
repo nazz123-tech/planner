@@ -36,8 +36,6 @@ export function useImportTasks() {
 
             return { imported: tasks.length };
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["tasks", user?.uid] });
-        },
     });
 }
+

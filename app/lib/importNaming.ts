@@ -146,6 +146,48 @@ function hashIndex(value: string, mod: number): number {
     return hash % mod;
 }
 
+/**
+ * Pick a palette colour for a new imported board. Prefers a colour that no
+ * existing category is using yet (stable per name among the free ones); once
+ * every palette colour is taken it falls back to the least-used one.
+ */
+export function pickCategoryColor(
+    name: string,
+    usedColors: readonly string[] = [],
+): string {
+    const normalized = usedColors
+        .map((color) => color.trim().toLowerCase())
+        .filter(Boolean);
+    const usedSet = new Set(normalized);
+
+    const free = CATEGORY_COLORS.filter(
+        (color) => !usedSet.has(color.toLowerCase()),
+    );
+
+    const start = hashIndex(name.toLowerCase(), CATEGORY_COLORS.length);
+
+    if (free.length > 0) {
+        return free[hashIndex(name.toLowerCase(), free.length)] ?? free[0];
+    }
+
+    const counts = new Map<string, number>();
+    for (const color of normalized) {
+        counts.set(color, (counts.get(color) ?? 0) + 1);
+    }
+
+    let best = CATEGORY_COLORS[start];
+    let bestCount = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < CATEGORY_COLORS.length; i += 1) {
+        const color = CATEGORY_COLORS[(start + i) % CATEGORY_COLORS.length];
+        const count = counts.get(color.toLowerCase()) ?? 0;
+        if (count < bestCount) {
+            best = color;
+            bestCount = count;
+        }
+    }
+    return best;
+}
+
 function matchEmoji(text: string): string | null {
     const haystack = text.toLowerCase();
     for (const rule of EMOJI_RULES) {
@@ -189,6 +231,7 @@ function recurringKeyword(titles: string[]): string | null {
 export function deriveImportCategory(
     result: IcsParseResult,
     fileName: string,
+    usedColors: readonly string[] = [],
 ): SuggestedCategory {
     const titles = result.events.map((event) => event.title);
 
@@ -226,10 +269,7 @@ export function deriveImportCategory(
     ].join(" ");
 
     const emoji = matchEmoji(name) ?? matchEmoji(wideText) ?? DEFAULT_EMOJI;
-
-    const color =
-        CATEGORY_COLORS[hashIndex(name.toLowerCase(), CATEGORY_COLORS.length)] ??
-        CATEGORY_COLORS[0];
+    const color = pickCategoryColor(name, usedColors);
 
     return { name, emoji, color };
 }

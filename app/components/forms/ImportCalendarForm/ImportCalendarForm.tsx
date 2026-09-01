@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef, useState, type DragEvent } from "react";
+import { useMemo, useRef, useState, type DragEvent } from "react";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
 import { parseIcs, type IcsParseResult } from "@/app/lib/ics";
-import { deriveImportCategory } from "@/app/lib/importNaming";
+import { deriveImportCategory, pickCategoryColor } from "@/app/lib/importNaming";
 import { useImportTasks } from "@/app/hooks/tasks/useImportTasks";
 import { useCategories } from "@/app/hooks/categories/useCategories";
 import { useCreateCategory } from "@/app/hooks/categories/useCreateCategory";
@@ -37,10 +37,19 @@ export const ImportCalendarForm = ({
     const [groupMode, setGroupMode] = useState<GroupMode>("new");
     const [newName, setNewName] = useState("");
     const [newEmoji, setNewEmoji] = useState(FALLBACK_EMOJI);
-    const [newColor, setNewColor] = useState<string | undefined>(undefined);
     const [existingId, setExistingId] = useState<string | undefined>(undefined);
 
     const { data: categories } = useCategories();
+
+    // Colours already taken by existing boards — a new imported board avoids
+    // them so every category stays visually distinct.
+    const usedColors = useMemo(
+        () =>
+            (categories ?? [])
+                .map((category) => category.color)
+                .filter((color): color is string => Boolean(color)),
+        [categories],
+    );
     const { mutateAsync: importTasks, isPending: importing } = useImportTasks();
     const { mutateAsync: createCategory, isPending: creating } =
         useCreateCategory();
@@ -78,10 +87,13 @@ export const ImportCalendarForm = ({
                 return;
             }
 
-            const suggestion = deriveImportCategory(parsed, file.name);
+            const suggestion = deriveImportCategory(
+                parsed,
+                file.name,
+                usedColors,
+            );
             setNewName(suggestion.name);
             setNewEmoji(suggestion.emoji);
-            setNewColor(suggestion.color);
             setGroupMode("new");
             setExistingId(undefined);
 
@@ -108,7 +120,6 @@ export const ImportCalendarForm = ({
         setGroupMode("new");
         setNewName("");
         setNewEmoji(FALLBACK_EMOJI);
-        setNewColor(undefined);
         setExistingId(undefined);
         if (inputRef.current) inputRef.current.value = "";
     };
@@ -124,10 +135,12 @@ export const ImportCalendarForm = ({
 
         if (groupMode === "new") {
             const name = newName.trim() || FALLBACK_NAME;
+            // Recompute against the latest boards so a colour that got taken
+            // between opening the form and importing is still avoided.
             const ref = await createCategory({
                 name,
                 emoji: newEmoji.trim() || FALLBACK_EMOJI,
-                ...(newColor ? { color: newColor } : {}),
+                color: pickCategoryColor(name, usedColors),
             });
             return { id: ref.id, label: name };
         }

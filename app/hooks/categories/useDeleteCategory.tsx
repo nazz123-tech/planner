@@ -56,12 +56,6 @@ export function useDeleteCategory() {
 
             return { tasksRemoved, notesRemoved };
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["categories", user?.uid],
-            });
-            queryClient.invalidateQueries({ queryKey: ["tasks", user?.uid] });
-            queryClient.invalidateQueries({ queryKey: ["notes", user?.uid] });
-        },
     });
 }
+
