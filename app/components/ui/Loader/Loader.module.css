@@ -9,6 +9,7 @@
 }
 
 .fullscreen {
+    margin-top: 200px;
     position: fixed;
     inset: 0;
     z-index: 2000;

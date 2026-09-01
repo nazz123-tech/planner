@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { habitFormSchema, type HabitFormData } from "../schemas";
@@ -146,8 +146,17 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
                     />
                 </div>
 
-                {frequencyType === "weekdays" && (
-                    <div className={styles.field}>
+                <AnimatePresence initial={false}>
+                    {frequencyType === "weekdays" && (
+                    <motion.div
+                        className={styles.field}
+                        key="days"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.22, ease: "easeOut" }}
+                        style={{ overflow: "hidden" }}
+                    >
                         <label className={styles.label}>DAYS</label>
                         <Controller
                             name="days"
@@ -195,8 +204,9 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
                                 {errors.days.message}
                             </p>
                         )}
-                    </div>
-                )}
+                    </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <div className={styles.groupBtn}>
                     <button

@@ -23,7 +23,6 @@ export default function CalendarPageClient() {
     const [detailsDate, setDetailsDate] = useState<string | null>(null);
     const [createModal, setCreateModal] = useState<{
         date: string;
-        type: "task" | "note";
     } | null>(null);
 
     // Keep the last opened values around so modal content stays rendered
@@ -44,10 +43,7 @@ export default function CalendarPageClient() {
                     setDetailsDate(toDateKey(day, month, year))
                 }
                 onAddClick={(day, month, year) =>
-                    setCreateModal({
-                        date: toDateKey(day, month, year),
-                        type: "task",
-                    })
+                    setCreateModal({ date: toDateKey(day, month, year) })
                 }
                 onTaskMove={(taskId, date) => {
                     const task = tasks?.find((item) => item.id === taskId);
@@ -67,11 +63,7 @@ export default function CalendarPageClient() {
                         notes={notes ?? []}
                         categories={categories ?? []}
                         onAdd={() => {
-                            setCreateModal({ date: detailsView, type: "task" });
-                            setDetailsDate(null);
-                        }}
-                        onAddNote={() => {
-                            setCreateModal({ date: detailsView, type: "note" });
+                            setCreateModal({ date: detailsView });
                             setDetailsDate(null);
                         }}
                     />
@@ -82,7 +74,6 @@ export default function CalendarPageClient() {
                 {createView && (
                     <CreateForm
                         defaultDate={createView.date}
-                        defaultType={createView.type}
                         lockDate
                         onSuccess={() => setCreateModal(null)}
                         onCancel={() => setCreateModal(null)}

@@ -1,12 +1,13 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flame, Check } from "lucide-react";
+import { Flame } from "lucide-react";
 import dayjs from "dayjs";
 import { useHabits } from "@/app/hooks/habits/useHabits";
 import { useToggleHabit } from "@/app/hooks/habits/useToggleHabit";
 import { frequencyLabel, isScheduledOn } from "@/app/shared/habits";
 import styles from "./HabitInfo.module.css";
 import { EmptyState } from "../EmptyState/EmptyState";
+import { CheckToggle } from "../CheckToggle/CheckToggle";
 
 export const HabitInfo = () => {
     const { habits } = useHabits();
@@ -70,23 +71,20 @@ export const HabitInfo = () => {
                                     </span>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    className={`${styles.check} ${habit.completedToday ? styles.checkDone : ""}`}
-                                    onClick={() =>
+                                <CheckToggle
+                                    checked={habit.completedToday}
+                                    onChange={() =>
                                         toggleHabit({
                                             habitId: habit.id,
                                             done: habit.completedToday,
                                         })
                                     }
-                                    aria-label={
+                                    label={
                                         habit.completedToday
                                             ? "Mark not done"
                                             : "Mark done today"
                                     }
-                                >
-                                    {habit.completedToday && <Check size={14} />}
-                                </button>
+                                />
                             </motion.li>
                         ))}
                     </AnimatePresence>

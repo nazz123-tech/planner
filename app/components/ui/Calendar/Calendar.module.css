@@ -307,8 +307,8 @@
 }
 
 .monthLabel {
-    order: 3;
-    margin-top: auto;
+    position: absolute;
+    bottom: 0;
     padding-top: 2px;
     font-size: 12px;
     font-weight: 600;
@@ -373,6 +373,8 @@
     font-size: 10px;
     color: var(--text-muted);
     padding-left: 2px;
+    background-color: var(--card-background);
+    border: var(--border);
 }
 
 @media (min-width: 640px) {

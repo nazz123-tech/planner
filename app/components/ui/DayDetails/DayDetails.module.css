@@ -190,12 +190,10 @@
 
 .addRow {
     display: flex;
-    gap: 8px;
     margin-top: 4px;
 }
 
-.addBtn,
-.addNoteBtn {
+.addBtn {
     flex: 1;
     min-width: 0;
     height: 46px;
@@ -208,28 +206,13 @@
     font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
-    transition: background 200ms ease, color 200ms ease,
-        border-color 200ms ease;
-}
-
-.addBtn {
     border: 1px solid var(--primary);
     background: var(--primary);
     color: var(--text-on-primary);
+    transition: background 200ms ease, border-color 200ms ease;
 }
 
 .addBtn:hover {
     background: var(--primary-hover);
     border-color: var(--primary-hover);
-}
-
-.addNoteBtn {
-    border: 1px solid var(--accent);
-    background: transparent;
-    color: var(--accent-deep);
-}
-
-.addNoteBtn:hover {
-    background: var(--accent);
-    color: var(--text-on-primary);
 }
