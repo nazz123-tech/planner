@@ -8,6 +8,8 @@ import {
     type PanInfo,
 } from "framer-motion";
 import { TextAlignStart } from "lucide-react";
+import { readableTextColor } from "@/app/lib/color";
+import { useDragTask } from "@/app/components/context/DragTaskContext";
 import styles from "./Calendar.module.css";
 import type { Task } from "@/app/types/task";
 import type { Note } from "@/app/types/note";
@@ -36,6 +38,7 @@ interface ContinuousCalendarProps {
     onClick?: (day: number, month: number, year: number) => void;
     onAddClick?: (day: number, month: number, year: number) => void;
     onTaskMove?: (taskId: string, date: string) => void;
+    onImportClick?: () => void;
 }
 
 function toDateKey(day: number, month: number, year: number): string {
@@ -49,9 +52,11 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
     onClick,
     onAddClick,
     onTaskMove,
+    onImportClick,
 }) => {
     const today = new Date();
     const reduceMotion = useReducedMotion();
+    const { setDraggingTaskId } = useDragTask();
     const containerRef = useRef<HTMLDivElement | null>(null);
     const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [{ year, dir: yearDir }, setYearState] = useState<{
@@ -214,11 +219,13 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         e.dataTransfer.setData("text/plain", taskId);
         e.dataTransfer.effectAllowed = "move";
         setDragTaskId(taskId);
+        setDraggingTaskId(taskId);
     };
 
     const handleTaskDragEnd = () => {
         setDragTaskId(null);
         setDragOverKey(null);
+        setDraggingTaskId(null);
     };
 
     const handleDayDragOver = (
@@ -391,10 +398,15 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                 <div className={styles.eventsList}>
                                     {visibleTasks.map((task) => {
                                         const color =
-                                            task.categoryId &&
-                                            categoryColorById.get(
-                                                task.categoryId,
-                                            );
+                                            (task.categoryId &&
+                                                categoryColorById.get(
+                                                    task.categoryId,
+                                                )) ||
+                                            undefined;
+
+                                        const textColor = color
+                                            ? readableTextColor(color)
+                                            : undefined;
 
                                         const draggable =
                                             !!onTaskMove && !isOutsideMonth;
@@ -426,7 +438,8 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                                         : ""
                                                 } ${draggable ? styles.draggablePill : ""}`}
                                                 style={{
-                                                    backgroundColor: `${color}`,
+                                                    backgroundColor: color,
+                                                    color: textColor ?? undefined,
                                                 }}
                                             >
                                                 {task.title}
@@ -504,6 +517,36 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                         >
                             Today
                         </button>
+                        {onImportClick && (
+                            <button
+                                onClick={onImportClick}
+                                type="button"
+                                className={styles.importButton}
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    width="15"
+                                    height="15"
+                                    fill="none"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M12 15V3m0 0 4 4m-4-4L8 7"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                    <path
+                                        d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                                Import .ics
+                            </button>
+                        )}
                     </div>
                     <div className={styles.yearControls}>
                         <button

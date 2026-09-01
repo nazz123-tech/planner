@@ -6,29 +6,30 @@ import { useAuth } from "../useAuth";
 import type { Task } from "@/app/types/task";
 
 export function useTasks() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+    const { user } = useAuth();
+    const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!user) return;
+    useEffect(() => {
+        if (!user) return;
 
-    const unsubscribe = onSnapshot(
-      collection(db, `users/${user.uid}/tasks`),
-      (snapshot) => {
-        const tasks = snapshot.docs.map(
-          (d) => ({ id: d.id, ...d.data() }) as Task,
+        const unsubscribe = onSnapshot(
+            collection(db, `users/${user.uid}/tasks`),
+            (snapshot) => {
+                const tasks = snapshot.docs.map(
+                    (d) => ({ id: d.id, ...d.data() }) as Task,
+                );
+                queryClient.setQueryData(["tasks", user.uid], tasks);
+            },
         );
-        queryClient.setQueryData(["tasks", user.uid], tasks);
-      },
-    );
 
-    return () => unsubscribe();
-  }, [user, queryClient]);
+        return () => unsubscribe();
+    }, [user, queryClient]);
 
-  return useQuery({
-    queryKey: ["tasks", user?.uid],
-    queryFn: () => [] as Task[],
-    enabled: !!user,
-    staleTime: Infinity,
-  });
+    return useQuery({
+        queryKey: ["tasks", user?.uid],
+        queryFn: () => [] as Task[],
+        enabled: !!user,
+        staleTime: Infinity,
+    });
 }
+

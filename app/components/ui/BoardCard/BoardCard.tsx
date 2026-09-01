@@ -15,11 +15,35 @@ interface BoardCardProps {
     progress: number;
 }
 export const BoardCard = (board: BoardCardProps) => {
-    const { mutate: deleteCategory } = useDeleteCategory();
+    const { mutateAsync: deleteCategory, isPending } = useDeleteCategory();
 
-    const onDelete = async (boardId: string) => {
-        await deleteCategory(boardId);
-        toast.success("Category delete is completed");
+    const onDelete = async () => {
+        const parts = [
+            board.taskCount > 0 &&
+                `${board.taskCount} task${board.taskCount === 1 ? "" : "s"}`,
+            board.noteCount > 0 &&
+                `${board.noteCount} note${board.noteCount === 1 ? "" : "s"}`,
+        ].filter(Boolean);
+
+        const message = parts.length
+            ? `Delete “${board.name}” and its ${parts.join(" and ")}? This can’t be undone.`
+            : `Delete “${board.name}”?`;
+
+        if (!window.confirm(message)) return;
+
+        try {
+            const { tasksRemoved, notesRemoved } = await deleteCategory(
+                board.id,
+            );
+            const removed = tasksRemoved + notesRemoved;
+            toast.success(
+                removed > 0
+                    ? `Deleted “${board.name}” and ${removed} item${removed === 1 ? "" : "s"}`
+                    : `Deleted “${board.name}”`,
+            );
+        } catch {
+            toast.error("Couldn’t delete the board");
+        }
     };
     return (
         <div className={styles.card}>
@@ -43,7 +67,10 @@ export const BoardCard = (board: BoardCardProps) => {
                         </div>
                     )}
                     <button
-                        onClick={() => onDelete(board.id)}
+                        type="button"
+                        onClick={onDelete}
+                        disabled={isPending}
+                        aria-label={`Delete ${board.name}`}
                         className={styles.deleteBtn}
                     >
                         <Trash size={12} />

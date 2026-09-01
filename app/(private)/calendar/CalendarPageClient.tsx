@@ -7,6 +7,7 @@ import { useCategories } from "@/app/hooks/categories/useCategories";
 import { useUpdateTask } from "@/app/hooks/tasks/useUpdateTask";
 import Modal from "@/app/components/ui/Modal/Modal";
 import { CreateForm } from "@/app/components/forms/CreateForm/CreateForm";
+import { ImportCalendarForm } from "@/app/components/forms/ImportCalendarForm/ImportCalendarForm";
 import { DayDetails } from "@/app/components/ui/DayDetails/DayDetails";
 import styles from "./page.module.css";
 
@@ -24,9 +25,8 @@ export default function CalendarPageClient() {
     const [createModal, setCreateModal] = useState<{
         date: string;
     } | null>(null);
+    const [importOpen, setImportOpen] = useState(false);
 
-    // Keep the last opened values around so modal content stays rendered
-    // while the modal plays its exit animation after being closed.
     const [detailsView, setDetailsView] = useState<string | null>(null);
     if (detailsDate && detailsDate !== detailsView) setDetailsView(detailsDate);
 
@@ -34,28 +34,28 @@ export default function CalendarPageClient() {
     if (createModal && createModal !== createView) setCreateView(createModal);
 
     return (
-        <div className={styles.container}>
-            <ContinuousCalendar
-                tasks={tasks ?? []}
-                categories={categories ?? []}
-                notes={notes ?? []}
-                onClick={(day, month, year) =>
-                    setDetailsDate(toDateKey(day, month, year))
-                }
-                onAddClick={(day, month, year) =>
-                    setCreateModal({ date: toDateKey(day, month, year) })
-                }
-                onTaskMove={(taskId, date) => {
-                    const task = tasks?.find((item) => item.id === taskId);
-                    if (!task || task.date === date) return;
-                    updateTask({ taskId, data: { date } });
-                }}
-            />
+        <div className={styles.page}>
+            <div className={styles.container}>
+                <ContinuousCalendar
+                    tasks={tasks ?? []}
+                    categories={categories ?? []}
+                    notes={notes ?? []}
+                    onClick={(day, month, year) =>
+                        setDetailsDate(toDateKey(day, month, year))
+                    }
+                    onAddClick={(day, month, year) =>
+                        setCreateModal({ date: toDateKey(day, month, year) })
+                    }
+                    onTaskMove={(taskId, date) => {
+                        const task = tasks?.find((item) => item.id === taskId);
+                        if (!task || task.date === date) return;
+                        updateTask({ taskId, data: { date } });
+                    }}
+                    onImportClick={() => setImportOpen(true)}
+                />
+            </div>
 
-            <Modal
-                open={!!detailsDate}
-                onClose={() => setDetailsDate(null)}
-            >
+            <Modal open={!!detailsDate} onClose={() => setDetailsDate(null)}>
                 {detailsView && (
                     <DayDetails
                         date={detailsView}
@@ -80,6 +80,14 @@ export default function CalendarPageClient() {
                     />
                 )}
             </Modal>
+
+            <Modal open={importOpen} onClose={() => setImportOpen(false)}>
+                <ImportCalendarForm
+                    onSuccess={() => setImportOpen(false)}
+                    onCancel={() => setImportOpen(false)}
+                />
+            </Modal>
         </div>
     );
 }
+

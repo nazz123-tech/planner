@@ -14,11 +14,6 @@ export function useCreateCategory() {
                 ...category,
                 createdAt: serverTimestamp(),
             }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["categories", user?.uid],
-            });
-        },
     });
 }
 

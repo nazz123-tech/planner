@@ -146,6 +146,30 @@
     background: var(--accent);
 }
 
+.importButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 9999px;
+    border: 1px solid var(--border);
+    background: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.importButton:hover {
+    background: var(--background-deep);
+    border-color: var(--accent);
+    color: var(--accent-deep);
+}
+
 .yearControls {
     display: flex;
     align-items: center;
@@ -336,6 +360,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    background-color: var(--background-deep);
+    color: var(--text-primary);
     animation: pillIn 0.2s ease;
     transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
 }
