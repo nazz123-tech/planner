@@ -360,6 +360,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    background-color: var(--background-deep);
+    color: var(--text-primary);
     animation: pillIn 0.2s ease;
     transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
 }

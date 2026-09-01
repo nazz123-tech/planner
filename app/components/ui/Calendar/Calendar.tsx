@@ -8,6 +8,7 @@ import {
     type PanInfo,
 } from "framer-motion";
 import { TextAlignStart } from "lucide-react";
+import { readableTextColor } from "@/app/lib/color";
 import styles from "./Calendar.module.css";
 import type { Task } from "@/app/types/task";
 import type { Note } from "@/app/types/note";
@@ -393,10 +394,15 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                 <div className={styles.eventsList}>
                                     {visibleTasks.map((task) => {
                                         const color =
-                                            task.categoryId &&
-                                            categoryColorById.get(
-                                                task.categoryId,
-                                            );
+                                            (task.categoryId &&
+                                                categoryColorById.get(
+                                                    task.categoryId,
+                                                )) ||
+                                            undefined;
+
+                                        const textColor = color
+                                            ? readableTextColor(color)
+                                            : undefined;
 
                                         const draggable =
                                             !!onTaskMove && !isOutsideMonth;
@@ -428,7 +434,8 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                                         : ""
                                                 } ${draggable ? styles.draggablePill : ""}`}
                                                 style={{
-                                                    backgroundColor: `${color}`,
+                                                    backgroundColor: color,
+                                                    color: textColor ?? undefined,
                                                 }}
                                             >
                                                 {task.title}
