@@ -1,25 +1,25 @@
 import dayjs from "dayjs";
 
-/**
- * Minimal iCalendar (RFC 5545) reader. Extracts VEVENT blocks and maps each
- * one onto the shape the planner needs: a wall-clock date, an optional time,
- * a title and a description. Recurrence rules are not expanded — only the
- * DTSTART occurrence of a recurring event is imported (and flagged).
- *
- * Kept dependency-free on purpose: the app already ships dayjs, and a hand
- * rolled reader avoids pulling a full calendar library into the client bundle.
- */
 
 export interface ImportedEvent {
     uid?: string;
     title: string;
     /** YYYY-MM-DD, local wall-clock of the event start. */
     date: string;
-    /** HH:mm, omitted for all-day events. */
+   
     time?: string;
     description?: string;
     allDay: boolean;
     recurring: boolean;
+}
+
+export interface IcsCalendarMeta {
+    /** X-WR-CALNAME — the calendar's display name in the source app. */
+    name?: string;
+    /** X-WR-CALDESC — the calendar's description. */
+    description?: string;
+    /** PRODID — the app that produced the file. */
+    prodId?: string;
 }
 
 export interface IcsParseResult {
@@ -28,6 +28,8 @@ export interface IcsParseResult {
     skipped: number;
     /** Total VEVENT blocks seen. */
     total: number;
+    /** Calendar-level metadata (properties outside any VEVENT). */
+    calendar: IcsCalendarMeta;
 }
 
 const MAX_DESCRIPTION = 2000;
@@ -49,7 +51,6 @@ function unfoldLines(raw: string): string[] {
     return lines;
 }
 
-/** Unescape TEXT values: \\n \\, \\; \\\\ (case-insensitive for \\N). */
 function unescapeText(value: string): string {
     return value
         .replace(/\\n/gi, "\n")
@@ -64,7 +65,6 @@ interface ParsedLine {
     value: string;
 }
 
-/** Split "DTSTART;TZID=Europe/London:20240115T090000" into its parts. */
 function parseContentLine(line: string): ParsedLine | null {
     const colon = line.indexOf(":");
     if (colon === -1) return null;
@@ -91,7 +91,6 @@ interface StartValue {
     allDay: boolean;
 }
 
-/** Parse a DTSTART value into a local wall-clock date (+ time). */
 function parseStart(value: string, params: Record<string, string>): StartValue | null {
     const isDateOnly = params.VALUE === "DATE" || /^\d{8}$/.test(value);
 
@@ -155,6 +154,7 @@ export function parseIcs(raw: string): IcsParseResult {
     const lines = unfoldLines(raw);
 
     const events: ImportedEvent[] = [];
+    const calendar: IcsCalendarMeta = {};
     let total = 0;
     let skipped = 0;
 
@@ -179,7 +179,20 @@ export function parseIcs(raw: string): IcsParseResult {
             continue;
         }
 
-        if (!draft) continue;
+        if (!draft) {
+    
+            const meta = parseContentLine(line);
+            if (meta) {
+                if (meta.name === "X-WR-CALNAME") {
+                    calendar.name = unescapeText(meta.value).trim();
+                } else if (meta.name === "X-WR-CALDESC") {
+                    calendar.description = unescapeText(meta.value).trim();
+                } else if (meta.name === "PRODID" && !calendar.prodId) {
+                    calendar.prodId = meta.value.trim();
+                }
+            }
+            continue;
+        }
 
         const parsed = parseContentLine(line);
         if (!parsed) continue;
@@ -205,5 +218,5 @@ export function parseIcs(raw: string): IcsParseResult {
         }
     }
 
-    return { events, skipped, total };
+    return { events, skipped, total, calendar };
 }

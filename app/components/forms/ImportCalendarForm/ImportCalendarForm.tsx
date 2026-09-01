@@ -4,8 +4,10 @@ import { useRef, useState, type DragEvent } from "react";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
 import { parseIcs, type IcsParseResult } from "@/app/lib/ics";
+import { deriveImportCategory } from "@/app/lib/importNaming";
 import { useImportTasks } from "@/app/hooks/tasks/useImportTasks";
 import { useCategories } from "@/app/hooks/categories/useCategories";
+import { useCreateCategory } from "@/app/hooks/categories/useCreateCategory";
 import { CategoryPicker } from "../../ui/pickers/CategoryPicker/CategoryPicker";
 import type { Task } from "@/app/types/task";
 import styles from "./ImportCalendarForm.module.css";
@@ -15,7 +17,11 @@ interface ImportCalendarFormProps {
     onCancel: () => void;
 }
 
+type GroupMode = "new" | "existing" | "none";
+
 const PREVIEW_LIMIT = 8;
+const FALLBACK_EMOJI = "📅";
+const FALLBACK_NAME = "Imported events";
 
 export const ImportCalendarForm = ({
     onSuccess,
@@ -27,10 +33,19 @@ export const ImportCalendarForm = ({
     const [result, setResult] = useState<IcsParseResult | null>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [dragActive, setDragActive] = useState(false);
-    const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
+
+    const [groupMode, setGroupMode] = useState<GroupMode>("new");
+    const [newName, setNewName] = useState("");
+    const [newEmoji, setNewEmoji] = useState(FALLBACK_EMOJI);
+    const [newColor, setNewColor] = useState<string | undefined>(undefined);
+    const [existingId, setExistingId] = useState<string | undefined>(undefined);
 
     const { data: categories } = useCategories();
-    const { mutateAsync: importTasks, isPending } = useImportTasks();
+    const { mutateAsync: importTasks, isPending: importing } = useImportTasks();
+    const { mutateAsync: createCategory, isPending: creating } =
+        useCreateCategory();
+
+    const busy = importing || creating;
 
     const readFile = async (file: File) => {
         setErrorMsg(null);
@@ -63,6 +78,13 @@ export const ImportCalendarForm = ({
                 return;
             }
 
+            const suggestion = deriveImportCategory(parsed, file.name);
+            setNewName(suggestion.name);
+            setNewEmoji(suggestion.emoji);
+            setNewColor(suggestion.color);
+            setGroupMode("new");
+            setExistingId(undefined);
+
             setResult(parsed);
             setFileName(file.name);
         } catch {
@@ -83,12 +105,46 @@ export const ImportCalendarForm = ({
         setResult(null);
         setFileName(null);
         setErrorMsg(null);
-        setCategoryId(undefined);
+        setGroupMode("new");
+        setNewName("");
+        setNewEmoji(FALLBACK_EMOJI);
+        setNewColor(undefined);
+        setExistingId(undefined);
         if (inputRef.current) inputRef.current.value = "";
+    };
+
+    const resolveCategory = async (): Promise<{
+        id?: string;
+        label?: string;
+    }> => {
+        if (groupMode === "existing") {
+            const picked = categories?.find((c) => c.id === existingId);
+            return { id: picked?.id, label: picked?.name };
+        }
+
+        if (groupMode === "new") {
+            const name = newName.trim() || FALLBACK_NAME;
+            const ref = await createCategory({
+                name,
+                emoji: newEmoji.trim() || FALLBACK_EMOJI,
+                ...(newColor ? { color: newColor } : {}),
+            });
+            return { id: ref.id, label: name };
+        }
+
+        return {};
     };
 
     const handleImport = async () => {
         if (!result) return;
+
+        let category: { id?: string; label?: string };
+        try {
+            category = await resolveCategory();
+        } catch {
+            toast.error("Couldn't create the board. Please try again.");
+            return;
+        }
 
         const tasks: Omit<Task, "id">[] = result.events.map((event) => {
             const task: Omit<Task, "id"> = {
@@ -98,14 +154,17 @@ export const ImportCalendarForm = ({
             };
             if (event.time) task.time = event.time;
             if (event.description) task.description = event.description;
-            if (categoryId) task.categoryId = categoryId;
+            if (category.id) task.categoryId = category.id;
             return task;
         });
 
         try {
             const { imported } = await importTasks(tasks);
+            const suffix = imported === 1 ? "" : "s";
             toast.success(
-                `Imported ${imported} event${imported === 1 ? "" : "s"}`,
+                category.label
+                    ? `Imported ${imported} event${suffix} into “${category.label}”`
+                    : `Imported ${imported} event${suffix}`,
             );
             onSuccess();
         } catch {
@@ -117,6 +176,7 @@ export const ImportCalendarForm = ({
     const hiddenCount = (result?.events.length ?? 0) - preview.length;
     const recurringCount =
         result?.events.filter((event) => event.recurring).length ?? 0;
+    const hasExisting = (categories?.length ?? 0) > 0;
 
     return (
         <div className={styles.container}>
@@ -209,18 +269,74 @@ export const ImportCalendarForm = ({
                         )}
                     </div>
 
-                    {categories && categories.length > 0 && (
-                        <div className={styles.field}>
-                            <label className={styles.label}>
-                                ADD TO BOARD (OPTIONAL)
-                            </label>
-                            <CategoryPicker
-                                categories={categories}
-                                value={categoryId}
-                                onChange={setCategoryId}
-                            />
+                    <div className={styles.grouping}>
+                        <span className={styles.label}>GROUP INTO A BOARD</span>
+
+                        <div className={styles.modeRow}>
+                            <button
+                                type="button"
+                                className={`${styles.modeBtn} ${groupMode === "new" ? styles.modeBtnActive : ""}`}
+                                onClick={() => setGroupMode("new")}
+                            >
+                                New board
+                            </button>
+                            {hasExisting && (
+                                <button
+                                    type="button"
+                                    className={`${styles.modeBtn} ${groupMode === "existing" ? styles.modeBtnActive : ""}`}
+                                    onClick={() => setGroupMode("existing")}
+                                >
+                                    Existing
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                className={`${styles.modeBtn} ${groupMode === "none" ? styles.modeBtnActive : ""}`}
+                                onClick={() => setGroupMode("none")}
+                            >
+                                Don&apos;t group
+                            </button>
                         </div>
-                    )}
+
+                        {groupMode === "new" && (
+                            <div className={styles.newBoard}>
+                                <input
+                                    className={styles.emojiInput}
+                                    value={newEmoji}
+                                    onChange={(event) =>
+                                        setNewEmoji(event.target.value.slice(0, 2))
+                                    }
+                                    aria-label="Board emoji"
+                                    maxLength={2}
+                                />
+                                <input
+                                    className={styles.nameInput}
+                                    value={newName}
+                                    onChange={(event) =>
+                                        setNewName(event.target.value)
+                                    }
+                                    maxLength={30}
+                                    placeholder="Board name"
+                                    aria-label="Board name"
+                                />
+                            </div>
+                        )}
+
+                        {groupMode === "new" && (
+                            <span className={styles.suggestHint}>
+                                Suggested from the calendar you imported — edit
+                                as you like.
+                            </span>
+                        )}
+
+                        {groupMode === "existing" && hasExisting && (
+                            <CategoryPicker
+                                categories={categories ?? []}
+                                value={existingId}
+                                onChange={setExistingId}
+                            />
+                        )}
+                    </div>
 
                     <ul className={styles.previewList}>
                         {preview.map((event, index) => (
@@ -250,7 +366,7 @@ export const ImportCalendarForm = ({
                         type="button"
                         className={styles.reset}
                         onClick={reset}
-                        disabled={isPending}
+                        disabled={busy}
                     >
                         Choose a different file
                     </button>
@@ -262,7 +378,7 @@ export const ImportCalendarForm = ({
                     type="button"
                     className={styles.cancelBtn}
                     onClick={onCancel}
-                    disabled={isPending}
+                    disabled={busy}
                 >
                     Cancel
                 </button>
@@ -270,9 +386,13 @@ export const ImportCalendarForm = ({
                     type="button"
                     className={styles.submitBtn}
                     onClick={handleImport}
-                    disabled={!result || isPending}
+                    disabled={
+                        !result ||
+                        busy ||
+                        (groupMode === "existing" && !existingId)
+                    }
                 >
-                    {isPending
+                    {busy
                         ? "Importing…"
                         : result
                           ? `Import ${result.events.length} event${result.events.length === 1 ? "" : "s"}`

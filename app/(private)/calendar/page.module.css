@@ -3,35 +3,6 @@
     margin: 0 auto;
 }
 
-.toolbar {
-    display: flex;
-    justify-content: flex-end;
-    padding-bottom: 12px;
-}
-
-.importBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    height: 40px;
-    padding: 0 18px;
-    border-radius: 9999px;
-    border: 1px solid var(--border);
-    background: var(--background);
-    color: var(--text-primary);
-    font-family: var(--font-main);
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.03em;
-    cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.importBtn:hover {
-    border-color: var(--accent);
-    background: var(--card-background);
-}
-
 .container {
     height: 80vh;
     overflow-y: scroll;

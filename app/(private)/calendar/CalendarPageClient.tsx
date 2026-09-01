@@ -27,8 +27,6 @@ export default function CalendarPageClient() {
     } | null>(null);
     const [importOpen, setImportOpen] = useState(false);
 
-    // Keep the last opened values around so modal content stays rendered
-    // while the modal plays its exit animation after being closed.
     const [detailsView, setDetailsView] = useState<string | null>(null);
     if (detailsDate && detailsDate !== detailsView) setDetailsView(detailsDate);
 
@@ -37,37 +35,6 @@ export default function CalendarPageClient() {
 
     return (
         <div className={styles.page}>
-            <div className={styles.toolbar}>
-                <button
-                    type="button"
-                    className={styles.importBtn}
-                    onClick={() => setImportOpen(true)}
-                >
-                    <svg
-                        viewBox="0 0 24 24"
-                        width="16"
-                        height="16"
-                        fill="none"
-                        aria-hidden="true"
-                    >
-                        <path
-                            d="M12 15V3m0 0 4 4m-4-4L8 7"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                        <path
-                            d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                        />
-                    </svg>
-                    Import .ics
-                </button>
-            </div>
-
             <div className={styles.container}>
                 <ContinuousCalendar
                     tasks={tasks ?? []}
@@ -84,13 +51,11 @@ export default function CalendarPageClient() {
                         if (!task || task.date === date) return;
                         updateTask({ taskId, data: { date } });
                     }}
+                    onImportClick={() => setImportOpen(true)}
                 />
             </div>
 
-            <Modal
-                open={!!detailsDate}
-                onClose={() => setDetailsDate(null)}
-            >
+            <Modal open={!!detailsDate} onClose={() => setDetailsDate(null)}>
                 {detailsView && (
                     <DayDetails
                         date={detailsView}
@@ -125,3 +90,4 @@ export default function CalendarPageClient() {
         </div>
     );
 }
+
