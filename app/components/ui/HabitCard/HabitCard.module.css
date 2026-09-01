@@ -1,0 +1,172 @@
+.card {
+    background-color: var(--card-background);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 25px;
+    border: 1px solid var(--border);
+    gap: 15px;
+    transition: all 0.1s ease-in;
+}
+
+.card:hover {
+    border-color: var(--accent-hover);
+    transform: translateY(-4px);
+}
+
+.cardHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.emojiWrapper {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background);
+    border-radius: 15px;
+}
+
+.emoji {
+    font-size: 24px;
+}
+
+.headerRight {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 2px 10px;
+    color: var(--accent-deep);
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 100px;
+    background-color: var(--background);
+}
+
+.deleteBtn {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background-color: transparent;
+    color: #cb3534;
+    cursor: pointer;
+    transition: all 200ms ease;
+}
+
+.deleteBtn:hover {
+    background-color: #cb3534;
+    color: white;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cardName {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.subtext {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.week {
+    display: flex;
+    gap: 6px;
+}
+
+.dayDot {
+    flex: 1;
+    aspect-ratio: 1;
+    max-width: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    transition: background-color 0.18s ease, border-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.dayLetter {
+    font-family: var(--font-main);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.dayDone {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.dayDone .dayLetter {
+    color: var(--text-on-primary);
+}
+
+.dayOff {
+    background-color: transparent;
+    border-style: dashed;
+    opacity: 0.5;
+}
+
+.toggleBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 44px;
+    border-radius: 9999px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent-deep);
+    font-family: var(--font-main);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 200ms ease, color 200ms ease,
+        border-color 200ms ease;
+}
+
+.toggleBtn:hover {
+    background: var(--accent);
+    color: var(--text-on-primary);
+}
+
+.toggleDone {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--text-on-primary);
+}
+
+.toggleDone:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: var(--text-on-primary);
+}

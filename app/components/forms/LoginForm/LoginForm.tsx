@@ -5,12 +5,14 @@ import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 import { loginSchema } from "../schemas";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { signInWithEmail } from "@/app/lib/auth";
+import { resetPassword, signInWithEmail } from "@/app/lib/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { GoogleAuth } from "../../ui/GoogleAuth/GoogleAuth";
 import styles from "./Login.module.css";
 import Link from "next/link";
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export interface LoginFormData {
     email: string;
@@ -19,14 +21,46 @@ export interface LoginFormData {
 export const LoginForm = () => {
     const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
+    const [isResetting, setIsResetting] = useState(false);
     const {
         register,
         handleSubmit,
         setError,
+        getValues,
         formState: { errors },
     } = useForm<LoginFormData>({
         resolver: yupResolver(loginSchema),
     });
+
+    const handleForgotPassword = async () => {
+        const email = (getValues("email") ?? "").trim();
+
+        if (!EMAIL_PATTERN.test(email)) {
+            setError("email", {
+                type: "manual",
+                message: "Enter your email above to reset your password",
+            });
+            toast.error("Enter your email above first");
+            return;
+        }
+
+        setIsResetting(true);
+        try {
+            await resetPassword(email);
+            toast.success(`Password reset link sent to ${email}`);
+        } catch (error) {
+            const code = (error as { code?: string }).code;
+            if (code === "auth/invalid-email") {
+                toast.error("That email address looks invalid");
+            } else if (code === "auth/too-many-requests") {
+                toast.error("Too many attempts — try again in a few minutes");
+            } else {
+                toast.error("Couldn't send the reset email. Try again");
+            }
+        } finally {
+            setIsResetting(false);
+        }
+    };
     const onSubmit = async (data: LoginFormData) => {
         try {
             await signInWithEmail(data);
@@ -89,9 +123,14 @@ export const LoginForm = () => {
                             {errors.password.message}
                         </p>
                     )}
-                    <Link className={styles.linkPass} href={""}>
-                        Forgot password?
-                    </Link>
+                    <button
+                        type="button"
+                        className={styles.linkPass}
+                        onClick={handleForgotPassword}
+                        disabled={isResetting}
+                    >
+                        {isResetting ? "Sending link…" : "Forgot password?"}
+                    </button>
                 </div>
 
                 <div className={styles.buttonsGroup}>

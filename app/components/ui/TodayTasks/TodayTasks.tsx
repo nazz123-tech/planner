@@ -2,6 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Task } from "@/app/types/task";
 import styles from "./TodayTasks.module.css";
+import { EmptyState } from "../EmptyState/EmptyState";
 
 import { useToggleTaskDone } from "@/app/hooks/tasks/useToggleDone";
 interface TodayTasksProps {
@@ -14,11 +15,22 @@ export const TodayTasks = ({ tasks, onCreate }: TodayTasksProps) => {
         <div className={styles.tasks}>
             <div className={styles.card}>
                 <ul className={styles.list}>
-                    {tasks.length > 0 && (
-                        <span className={styles.sectionLabel}>
-                            01 / Today tasks
-                        </span>
+                    <span className={styles.sectionLabel}>
+                        01 / Today tasks
+                    </span>
+
+                    {tasks.length === 0 && (
+                        <li>
+                            <EmptyState
+                                icon="🗒️"
+                                title="Nothing planned today"
+                                hint="Add a task and it will show up right here."
+                                actionLabel="New task"
+                                onAction={onCreate}
+                            />
+                        </li>
                     )}
+
                     <AnimatePresence initial={false}>
                         {tasks.map((task) => (
                             <motion.li

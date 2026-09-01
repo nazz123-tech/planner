@@ -1,5 +1,5 @@
 // SIGNIN SIGNUP LOGOUT GOOGLE AUTH
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider , signOut} from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider , signOut, sendPasswordResetEmail} from 'firebase/auth';
 import { auth } from './firebase';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -48,3 +48,12 @@ export const signUp = async ({email,password,name}:RegisterFormData) => {
 export const logout = async () => {
   await signOut(auth)
 }
+
+// FORGOT PASSWORD
+// Sends a Firebase password-reset email. Firebase hosts the reset page and
+// handles the token/expiry, so the app needs no dedicated reset route.
+// With email-enumeration protection enabled, Firebase resolves successfully
+// even when the address has no account, so callers should not branch on that.
+export const resetPassword = async (email: string) => {
+  await sendPasswordResetEmail(auth, email.trim());
+};

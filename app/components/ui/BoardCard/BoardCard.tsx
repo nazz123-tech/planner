@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Trash, ListChecks, TextAlignStart } from "lucide-react";
 import { useDeleteCategory } from "@/app/hooks/categories/useDeleteCategory";
 import styles from "./BoardCard.module.css";
@@ -50,7 +51,7 @@ export const BoardCard = (board: BoardCardProps) => {
                 </div>
             </div>
 
-            <div className={styles.info}>
+            <Link href={`/boards/${board.id}`} className={styles.info}>
                 <h2 className={styles.cardName}>{board.name}</h2>
                 <div className={styles.textBlock}>
                     <p className={styles.subtext}>
@@ -63,7 +64,7 @@ export const BoardCard = (board: BoardCardProps) => {
                         </p>
                     )}
                 </div>
-            </div>
+            </Link>
             <div className={styles.progressTrack}>
                 <motion.div
                     className={styles.progressFill}

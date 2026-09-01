@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { RegisterForm } from "@/app/components/forms/RegisterForm/RegisterForm";
 import { Logo } from "@/app/components/ui/Logo/Logo";
 import styles from "./page.module.css";
+
+export const metadata: Metadata = {
+    title: "Create account",
+    description: "Create a Planly account and start planning.",
+};
 
 export default function RegisterPage() {
     return (

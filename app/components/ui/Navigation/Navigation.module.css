@@ -42,7 +42,7 @@
 .fab {
     position: absolute;
     top: calc(50% + 47px);
-    left: 50%;
+    left: calc(50%);
     transform: translate(-50%, -50%) scale(1);
     width: 56px;
     height: 56px;
@@ -76,6 +76,7 @@
     padding:  18px;
     font-family: var(--font-secondary);
     letter-spacing: 1px;
+    border: 1px solid transparent;
     border-radius: 9999px;
     gap: 5px;
     cursor: pointer;
@@ -98,9 +99,21 @@
 }
 
 .active {
-    border: solid 1px var(--accent);
-    background-color: var(--background-deep);
     pointer-events: none;
+}
+
+.highlight {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 9999px;
+    background-color: var(--background-deep);
+    border: 1px solid var(--accent);
+}
+
+.itemLabel {
+    position: relative;
+    z-index: 1;
 }
 
 .icon {

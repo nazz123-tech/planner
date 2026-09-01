@@ -63,7 +63,12 @@
     border-radius: 5px;
 }
 .info{
-    display: inline;
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+.info:hover .cardName{
+    color: var(--accent-deep);
 }
 .subtext{
     color: var(--text-muted);

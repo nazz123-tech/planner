@@ -2,6 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useBoards } from "@/app/hooks/boards/useBoards";
 import styles from "./BoardInfo.module.css";
+import { EmptyState } from "../EmptyState/EmptyState";
 
 export const BoardInfo = () => {
     const { boards } = useBoards();
@@ -9,9 +10,18 @@ export const BoardInfo = () => {
         <div className={styles.boards}>
             <div className={styles.card}>
                 <ul className={styles.list}>
-                    {boards.length > 0 && (
-                        <span className={styles.sectionLabel}>02 / Boards</span>
+                    <span className={styles.sectionLabel}>02 / Boards</span>
+
+                    {boards.length === 0 && (
+                        <li>
+                            <EmptyState
+                                icon="🗂️"
+                                title="No boards yet"
+                                hint="Group tasks and notes by creating a board."
+                            />
+                        </li>
                     )}
+
                     <AnimatePresence initial={false}>
                         {boards.map((board) => {
                             const percent = Math.round(

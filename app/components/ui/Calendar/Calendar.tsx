@@ -7,6 +7,7 @@ import {
     useReducedMotion,
     type PanInfo,
 } from "framer-motion";
+import { TextAlignStart } from "lucide-react";
 import styles from "./Calendar.module.css";
 import type { Task } from "@/app/types/task";
 import type { Note } from "@/app/types/note";
@@ -53,7 +54,6 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
     const reduceMotion = useReducedMotion();
     const containerRef = useRef<HTMLDivElement | null>(null);
     const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
-    // dir: -1 = moved to a previous year, 1 = next year, 0 = jump (month / today)
     const [{ year, dir: yearDir }, setYearState] = useState<{
         year: number;
         dir: number;
@@ -345,39 +345,8 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                             title={`${noteCount} note${noteCount > 1 ? "s" : ""}`}
                                             aria-label={`${noteCount} note${noteCount > 1 ? "s" : ""}`}
                                         >
-                                            <svg
-                                                viewBox="0 0 24 24"
-                                                width="18"
-                                                height="18"
-                                                fill="none"
-                                            >
-                                                <path
-                                                    d="M4 4h16v10l-6 6H4z"
-                                                    fill="currentColor"
-                                                    opacity="0.2"
-                                                />
-                                                <path
-                                                    d="M4 4h16v10l-6 6H4z"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinejoin="round"
-                                                />
-                                                <path
-                                                    d="M14 20v-6h6"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinejoin="round"
-                                                />
-                                            </svg>
-                                            {noteCount > 1 && (
-                                                <span
-                                                    className={
-                                                        styles.noteBadgeCount
-                                                    }
-                                                >
-                                                    {noteCount}
-                                                </span>
-                                            )}
+                                            <TextAlignStart size={12} />
+                                            {noteCount}
                                         </span>
                                     )}
                                     {onAddClick && !isOutsideMonth && (

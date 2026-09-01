@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Logo } from "../Logo/Logo";
 import { logout } from "@/app/lib/auth";
 import styles from "./Navigation.module.css";
@@ -148,8 +149,21 @@ export const Navigation = () => {
                                 href={item.href}
                                 className={`${styles.item} ${isActive ? styles.active : ""}`}
                             >
+                                {isActive && (
+                                    <motion.span
+                                        layoutId="navHighlight"
+                                        className={styles.highlight}
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 420,
+                                            damping: 34,
+                                        }}
+                                    />
+                                )}
                                 <Icon size={18} className={styles.icon} />
-                                <span>{item.label}</span>
+                                <span className={styles.itemLabel}>
+                                    {item.label}
+                                </span>
                             </Link>
                         </div>
                     );
