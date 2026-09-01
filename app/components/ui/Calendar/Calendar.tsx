@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import { TextAlignStart } from "lucide-react";
 import { readableTextColor } from "@/app/lib/color";
+import { useDragTask } from "@/app/components/context/DragTaskContext";
 import styles from "./Calendar.module.css";
 import type { Task } from "@/app/types/task";
 import type { Note } from "@/app/types/note";
@@ -55,6 +56,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
 }) => {
     const today = new Date();
     const reduceMotion = useReducedMotion();
+    const { setDraggingTaskId } = useDragTask();
     const containerRef = useRef<HTMLDivElement | null>(null);
     const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [{ year, dir: yearDir }, setYearState] = useState<{
@@ -217,11 +219,13 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         e.dataTransfer.setData("text/plain", taskId);
         e.dataTransfer.effectAllowed = "move";
         setDragTaskId(taskId);
+        setDraggingTaskId(taskId);
     };
 
     const handleTaskDragEnd = () => {
         setDragTaskId(null);
         setDragOverKey(null);
+        setDraggingTaskId(null);
     };
 
     const handleDayDragOver = (

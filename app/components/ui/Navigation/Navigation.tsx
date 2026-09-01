@@ -6,13 +6,17 @@ import {
     Kanban,
     CheckSquare,
     Plus,
+    Trash2,
     LogOut,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 import { Logo } from "../Logo/Logo";
 import { logout } from "@/app/lib/auth";
+import { useDragTask } from "@/app/components/context/DragTaskContext";
+import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
 import styles from "./Navigation.module.css";
 import { useLayoutEffect, useRef, useState } from "react";
 import Modal from "../Modal/Modal";
@@ -20,8 +24,26 @@ import { CreateForm } from "../../forms/CreateForm/CreateForm";
 
 export const Navigation = () => {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [dropHover, setDropHover] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
+
+    const { draggingTaskId, setDraggingTaskId } = useDragTask();
+    const { mutate: deleteTask } = useDeleteTask();
+    const isDeleteMode = draggingTaskId !== null;
+
+    const handleTaskDrop = (event: React.DragEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        const taskId =
+            event.dataTransfer.getData("text/plain") || draggingTaskId;
+        setDropHover(false);
+        setDraggingTaskId(null);
+        if (!taskId) return;
+        deleteTask(taskId, {
+            onSuccess: () => toast.success("Task deleted"),
+            onError: () => toast.error("Couldn’t delete the task"),
+        });
+    };
 
     const NAV_ITEMS = [
         { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -136,11 +158,41 @@ export const Navigation = () => {
                                     ref={fabSlotRef}
                                 >
                                     <button
-                                        onClick={() => setModalOpen(true)}
-                                        className={styles.fab}
-                                        aria-label="Add item"
+                                        type="button"
+                                        onClick={() => {
+                                            if (!isDeleteMode) {
+                                                setModalOpen(true);
+                                            }
+                                        }}
+                                        className={`${styles.fab} ${
+                                            isDeleteMode ? styles.fabDelete : ""
+                                        } ${
+                                            dropHover ? styles.fabDeleteOver : ""
+                                        }`}
+                                        aria-label={
+                                            isDeleteMode
+                                                ? "Drop a task here to delete it"
+                                                : "Add item"
+                                        }
+                                        onDragOver={(event) => {
+                                            if (!isDeleteMode) return;
+                                            event.preventDefault();
+                                            event.dataTransfer.dropEffect =
+                                                "move";
+                                        }}
+                                        onDragEnter={(event) => {
+                                            if (!isDeleteMode) return;
+                                            event.preventDefault();
+                                            setDropHover(true);
+                                        }}
+                                        onDragLeave={() => setDropHover(false)}
+                                        onDrop={handleTaskDrop}
                                     >
-                                        <Plus size={24} />
+                                        {isDeleteMode ? (
+                                            <Trash2 size={24} />
+                                        ) : (
+                                            <Plus size={24} />
+                                        )}
                                     </button>
                                 </div>
                             )}
