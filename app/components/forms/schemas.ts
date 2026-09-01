@@ -31,3 +31,26 @@ export const boardFormSchema = yup.object({
     color: yup.string().optional(),
     emoji:yup.string().required("Emoji is required")
 })
+
+export const habitFormSchema = yup.object({
+    name: yup
+        .string()
+        .trim()
+        .min(2, "Minimum 2 characters")
+        .max(30, "Maximum 30 characters")
+        .required("Name is required"),
+    emoji: yup.string().required("Pick an emoji"),
+    frequencyType: yup
+        .string()
+        .oneOf(["daily", "weekdays"] as const)
+        .required(),
+    days: yup
+        .array(yup.number().required())
+        .when("frequencyType", {
+            is: "weekdays",
+            then: (schema) => schema.min(1, "Select at least one day"),
+            otherwise: (schema) => schema,
+        })
+        .required(),
+});
+export type HabitFormData = yup.InferType<typeof habitFormSchema>;

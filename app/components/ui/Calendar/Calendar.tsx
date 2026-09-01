@@ -1,6 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+    AnimatePresence,
+    motion,
+    useReducedMotion,
+    type PanInfo,
+} from "framer-motion";
+import { TextAlignStart } from "lucide-react";
 import styles from "./Calendar.module.css";
 import type { Task } from "@/app/types/task";
 import type { Note } from "@/app/types/note";
@@ -44,9 +51,13 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
     onTaskMove,
 }) => {
     const today = new Date();
+    const reduceMotion = useReducedMotion();
     const containerRef = useRef<HTMLDivElement | null>(null);
     const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const [year, setYear] = useState<number>(new Date().getFullYear());
+    const [{ year, dir: yearDir }, setYearState] = useState<{
+        year: number;
+        dir: number;
+    }>(() => ({ year: new Date().getFullYear(), dir: 0 }));
     const [selectedMonth, setSelectedMonth] = useState<number>(0);
     const [dragTaskId, setDragTaskId] = useState<string | null>(null);
     const [dragOverKey, setDragOverKey] = useState<string | null>(null);
@@ -125,8 +136,12 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         }
     };
 
-    const handlePrevYear = () => setYear((prevYear) => prevYear - 1);
-    const handleNextYear = () => setYear((prevYear) => prevYear + 1);
+    const goToYear = (updater: (prevYear: number) => number, dir: number) => {
+        setYearState((prev) => ({ year: updater(prev.year), dir }));
+    };
+
+    const handlePrevYear = () => goToYear((prevYear) => prevYear - 1, -1);
+    const handleNextYear = () => goToYear((prevYear) => prevYear + 1, 1);
 
     const handleMonthChange = (value: string) => {
         const monthIndex = parseInt(value, 10);
@@ -144,10 +159,25 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                 month: targetMonth,
                 day: targetDay,
             };
-            setYear(today.getFullYear());
+            goToYear(
+                () => today.getFullYear(),
+                today.getFullYear() > year ? 1 : -1,
+            );
         } else {
             scrollToDay(targetMonth, targetDay);
         }
+    };
+
+    const handleGridPanEnd = (_event: PointerEvent, info: PanInfo) => {
+        const { offset } = info;
+        const horizontalIntent =
+            Math.abs(offset.x) > 90 &&
+            Math.abs(offset.x) > Math.abs(offset.y) * 1.5;
+
+        if (!horizontalIntent) return;
+
+        if (offset.x < 0) handleNextYear();
+        else handlePrevYear();
     };
 
     useEffect(() => {
@@ -315,39 +345,8 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                             title={`${noteCount} note${noteCount > 1 ? "s" : ""}`}
                                             aria-label={`${noteCount} note${noteCount > 1 ? "s" : ""}`}
                                         >
-                                            <svg
-                                                viewBox="0 0 24 24"
-                                                width="18"
-                                                height="18"
-                                                fill="none"
-                                            >
-                                                <path
-                                                    d="M4 4h16v10l-6 6H4z"
-                                                    fill="currentColor"
-                                                    opacity="0.2"
-                                                />
-                                                <path
-                                                    d="M4 4h16v10l-6 6H4z"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinejoin="round"
-                                                />
-                                                <path
-                                                    d="M14 20v-6h6"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinejoin="round"
-                                                />
-                                            </svg>
-                                            {noteCount > 1 && (
-                                                <span
-                                                    className={
-                                                        styles.noteBadgeCount
-                                                    }
-                                                >
-                                                    {noteCount}
-                                                </span>
-                                            )}
+                                            <TextAlignStart size={12} />
+                                            {noteCount}
                                         </span>
                                     )}
                                     {onAddClick && !isOutsideMonth && (
@@ -558,9 +557,44 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                     ))}
                 </div>
             </div>
-            <div className={styles.grid}>{generateCalendar}</div>
+            <div className={styles.gridWrap}>
+                <AnimatePresence
+                    mode="popLayout"
+                    initial={false}
+                    custom={yearDir}
+                >
+                    <motion.div
+                        key={year}
+                        className={styles.grid}
+                        custom={yearDir}
+                        variants={gridVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{
+                            duration: reduceMotion ? 0 : 0.28,
+                            ease: "easeInOut",
+                        }}
+                        onPanEnd={handleGridPanEnd}
+                    >
+                        {generateCalendar}
+                    </motion.div>
+                </AnimatePresence>
+            </div>
         </div>
     );
+};
+
+const gridVariants = {
+    enter: (dir: number) => ({
+        opacity: 0,
+        x: dir === 0 ? 0 : dir > 0 ? 48 : -48,
+    }),
+    center: { opacity: 1, x: 0 },
+    exit: (dir: number) => ({
+        opacity: 0,
+        x: dir === 0 ? 0 : dir > 0 ? -48 : 48,
+    }),
 };
 
 interface SelectProps {

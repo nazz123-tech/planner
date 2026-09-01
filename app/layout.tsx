@@ -24,7 +24,10 @@ const inter = Inter({
     display: "swap",
 });
 export const metadata: Metadata = {
-    title: "Planly",
+    title: {
+        default: "Planly",
+        template: "%s · Planly",
+    },
     description: "Plan in own way",
 };
 

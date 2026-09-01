@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createFormSchema, type CreateFormData } from "../schemas";
@@ -106,20 +107,29 @@ export const CreateForm = ({
             </h2>
             {!lockDate && (
                 <div className={styles.switcher}>
-                    <button
-                        className={`${styles.switchBtn} ${formType === "task" ? styles.active : ""}`}
-                        type="button"
-                        onClick={() => handleTypeChange("task")}
-                    >
-                        Task
-                    </button>
-                    <button
-                        className={`${styles.switchBtn} ${formType === "note" ? styles.active : ""}`}
-                        type="button"
-                        onClick={() => handleTypeChange("note")}
-                    >
-                        Note
-                    </button>
+                    {(["task", "note"] as const).map((type) => (
+                        <button
+                            key={type}
+                            className={`${styles.switchBtn} ${formType === type ? styles.active : ""}`}
+                            type="button"
+                            onClick={() => handleTypeChange(type)}
+                        >
+                            {formType === type && (
+                                <motion.span
+                                    layoutId="createTypePill"
+                                    className={styles.switchPill}
+                                    transition={{
+                                        type: "spring",
+                                        stiffness: 420,
+                                        damping: 34,
+                                    }}
+                                />
+                            )}
+                            <span className={styles.switchLabel}>
+                                {type === "task" ? "Task" : "Note"}
+                            </span>
+                        </button>
+                    ))}
                 </div>
             )}
 
@@ -161,25 +171,24 @@ export const CreateForm = ({
                                     + Create category
                                 </button>
 
-                                {categoryModalOpen && (
-                                    <Modal
-                                        onClose={() =>
+                                <Modal
+                                    open={categoryModalOpen}
+                                    onClose={() =>
+                                        setCategoryModalOpen(false)
+                                    }
+                                >
+                                    <BoardForm
+                                        onCreated={(id) =>
+                                            field.onChange(id)
+                                        }
+                                        onSuccess={() =>
                                             setCategoryModalOpen(false)
                                         }
-                                    >
-                                        <BoardForm
-                                            onCreated={(id) =>
-                                                field.onChange(id)
-                                            }
-                                            onSuccess={() =>
-                                                setCategoryModalOpen(false)
-                                            }
-                                            onCancel={() =>
-                                                setCategoryModalOpen(false)
-                                            }
-                                        />
-                                    </Modal>
-                                )}
+                                        onCancel={() =>
+                                            setCategoryModalOpen(false)
+                                        }
+                                    />
+                                </Modal>
                             </>
                         )}
                     />

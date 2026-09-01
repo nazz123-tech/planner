@@ -3,7 +3,6 @@ import { signInWithGoogle } from "@/app/lib/auth";
 import styles from "./GoogleAuth.module.css";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
-import { px } from "framer-motion";
 
 export const GoogleAuth = () => {
     const router = useRouter();

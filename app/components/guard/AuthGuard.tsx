@@ -2,16 +2,23 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
+import { Loader } from "@/app/components/ui/Loader/Loader";
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
-  const router = useRouter();
+    const { user, loading } = useAuth();
+    const router = useRouter();
 
-  useEffect(() => {
-    if (!user) router.push("/login");
-  }, [user, router]);
+    useEffect(() => {
+        if (!loading && !user) router.push("/login");
+    }, [user, loading, router]);
 
-  if (!user) return null;
+    if (loading) {
+        return <Loader fullscreen label="Loading your planner…" />;
+    }
 
-  return <>{children}</>;
+    if (!user) {
+        return <Loader fullscreen label="Redirecting…" />;
+    }
+
+    return <>{children}</>;
 };

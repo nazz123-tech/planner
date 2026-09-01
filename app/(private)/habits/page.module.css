@@ -1,0 +1,74 @@
+.container {
+    max-width: 1170px;
+    margin: 0 auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 15px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: 40px;
+    font-weight: 600;
+}
+
+.subtext {
+    font-family: var(--font-secondary);
+    color: var(--text-secondary);
+}
+
+.empty {
+    padding: 40px 15px;
+    font-family: var(--font-secondary);
+    color: var(--text-muted);
+}
+
+.createHabitBtn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    justify-content: center;
+    font-family: var(--font-secondary);
+    font-weight: 600;
+    width: 50px;
+    height: 50px;
+    border: none;
+    font-size: 15px;
+    border-radius: 100px;
+    background-color: var(--primary);
+    color: var(--text-on-primary);
+    cursor: pointer;
+    overflow: hidden;
+    transition: width 0.3s ease;
+}
+
+.createHabitBtn:hover {
+    gap: 4px;
+    width: 120px;
+}
+
+.btnText {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: max-width 0.3s ease, opacity 0.2s ease;
+}
+
+.createHabitBtn:hover .btnText {
+    max-width: 150px;
+    opacity: 1;
+}

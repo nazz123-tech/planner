@@ -1,0 +1,227 @@
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.back {
+    align-self: flex-start;
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    transition: color 0.15s ease;
+}
+
+.back:hover {
+    color: var(--primary);
+}
+
+.fallback {
+    padding: 40px 0;
+    text-align: center;
+    font-family: var(--font-secondary);
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 28px;
+    background: var(--card-background);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.emojiWrapper {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+}
+
+.emoji {
+    font-size: 28px;
+}
+
+.headerText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.kicker {
+    font-family: var(--font-main);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.metaLine {
+    font-family: var(--font-secondary);
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sectionHead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sectionTitle {
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--background-deep);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.taskRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.check {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--card-background);
+    color: var(--text-on-primary);
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.check:hover {
+    border-color: var(--accent);
+}
+
+.checkDone {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.taskBody {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+    color: inherit;
+    text-decoration: none;
+}
+
+.taskBody:hover .itemTitle {
+    color: var(--accent-deep);
+}
+
+.taskRow[data-done="true"] .itemTitle {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.noteRow {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.itemTitle {
+    font-family: var(--font-secondary);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-word;
+    transition: color 0.15s ease;
+}
+
+.itemDesc {
+    font-family: var(--font-secondary);
+    font-size: 12px;
+    color: var(--text-secondary);
+    word-break: break-word;
+}
+
+.itemMeta {
+    font-family: var(--font-main);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.empty {
+    padding: 4px 0;
+    font-family: var(--font-secondary);
+    font-size: 13px;
+    color: var(--text-muted);
+}

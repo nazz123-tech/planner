@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import dayjs from "dayjs";
@@ -12,6 +13,7 @@ import {
 } from "@/app/components/forms/schemas";
 import { useCategories } from "@/app/hooks/categories/useCategories";
 import { useUpdateTask } from "@/app/hooks/tasks/useUpdateTask";
+import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
 import { useToggleTaskDone } from "@/app/hooks/tasks/useToggleDone";
 import { CategoryPicker } from "@/app/components/ui/pickers/CategoryPicker/CategoryPicker";
 import { getFormattedDate } from "@/app/shared/constants";
@@ -23,10 +25,24 @@ interface TaskDetailsProps {
 
 export const TaskDetails = ({ task }: TaskDetailsProps) => {
     const [editing, setEditing] = useState(false);
+    const [confirmingDelete, setConfirmingDelete] = useState(false);
+    const router = useRouter();
 
     const { data: categories } = useCategories();
     const { mutateAsync: updateTask, isPending } = useUpdateTask();
+    const { mutateAsync: deleteTask, isPending: isDeleting } = useDeleteTask();
     const { mutate: toggleDone } = useToggleTaskDone();
+
+    const handleDelete = async () => {
+        try {
+            await deleteTask(task.id);
+            toast.success("Task deleted");
+            router.push("/calendar");
+        } catch {
+            toast.error("Could not delete task");
+            setConfirmingDelete(false);
+        }
+    };
 
     const category = task.categoryId
         ? categories?.find((c) => c.id === task.categoryId)
@@ -201,6 +217,40 @@ export const TaskDetails = ({ task }: TaskDetailsProps) => {
                     Edit task
                 </button>
             </div>
+
+            {confirmingDelete ? (
+                <div className={styles.deleteConfirm}>
+                    <span className={styles.deleteText}>
+                        Delete this task permanently?
+                    </span>
+                    <div className={styles.deleteActions}>
+                        <button
+                            type="button"
+                            className={styles.ghostBtn}
+                            onClick={() => setConfirmingDelete(false)}
+                            disabled={isDeleting}
+                        >
+                            Keep
+                        </button>
+                        <button
+                            type="button"
+                            className={styles.dangerBtn}
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? "Deleting..." : "Delete task"}
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <button
+                    type="button"
+                    className={styles.deleteLink}
+                    onClick={() => setConfirmingDelete(true)}
+                >
+                    Delete task
+                </button>
+            )}
         </div>
     );
 };

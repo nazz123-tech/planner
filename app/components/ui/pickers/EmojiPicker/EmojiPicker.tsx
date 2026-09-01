@@ -2,30 +2,30 @@
 import styles from "./EmojiPicker.module.css";
 
 const EMOJI_OPTIONS = [
-    "📝",
-    "💼",
-    "🏠",
-    "🛒",
-    "💪",
-    "📚",
-    "🎨",
-    "🍳",
-    "🚗",
-    "💰",
-    "🎯",
-    "🌱",
-    "❤️",
-    "🎮",
-    "✈️",
-    "🎵",
-    "📷",
-    "🧹",
-    "☕",
-    "🐶",
-    "🎬",
-    "💻",
-    "🏃",
-    "🛠️",
+    "💧", // water
+    "🥤", // hydrate
+    "🍎", // eat well
+    "🍳", // cook
+    "☕", // coffee
+    "🏋️", // train
+    "💪", // gym
+    "🏃", // run
+    "🚴", // bike
+    "🧘", // meditate
+    "🤸", // stretch
+    "🚶", // walk
+    "😴", // sleep
+    "📚", // read
+    "🎓", // study
+    "💻", // work
+    "💼", // job
+    "💰", // finance
+    "📝", // journal
+    "🧹", // clean
+    "🏠", // home
+    "🌱", // grow
+    "❤️", // health
+    "💊", // meds
 ];
 
 interface EmojiPreviewProps {

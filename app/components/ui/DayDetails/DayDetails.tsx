@@ -11,7 +11,6 @@ interface DayDetailsProps {
     notes: Note[];
     categories: Category[];
     onAdd: () => void;
-    onAddNote: () => void;
 }
 
 export const DayDetails = ({
@@ -20,7 +19,6 @@ export const DayDetails = ({
     notes,
     categories,
     onAdd,
-    onAddNote,
 }: DayDetailsProps) => {
     const categoryById = new Map(categories.map((c) => [c.id, c]));
 
@@ -167,13 +165,6 @@ export const DayDetails = ({
                     onClick={onAdd}
                 >
                     + Add task
-                </button>
-                <button
-                    type="button"
-                    className={styles.addNoteBtn}
-                    onClick={onAddNote}
-                >
-                    + Add note
                 </button>
             </div>
         </div>

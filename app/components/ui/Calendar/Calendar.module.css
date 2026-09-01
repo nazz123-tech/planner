@@ -192,6 +192,12 @@
     color: var(--text-primary);
 }
 
+.gridWrap {
+    position: relative;
+    overflow: hidden;
+    width: 1170px;
+}
+
 .grid {
     padding: 1rem 1.25rem 0;
     width: 1170px;
@@ -265,28 +271,16 @@
 }
 
 .noteBadge {
-    display: inline-flex;
+    display: flex;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
     gap: 2px;
-    color: var(--accent-deep);
-}
-
-.noteBadgeCount {
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1;
-    color: var(--accent-deep);
-}
-
-@media (min-width: 1024px) {
-    .noteBadge svg {
-        width: 22px;
-        height: 22px;
-    }
-
-    .noteBadgeCount {
-        font-size: 13px;
-    }
+    padding: 1px 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-radius: 100px;
+    background-color: var(--background);
 }
 
 .addButton {
@@ -313,7 +307,9 @@
 }
 
 .monthLabel {
-    margin-top: auto;
+    position: absolute;
+    bottom: 0;
+    padding-top: 2px;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-muted);
@@ -323,10 +319,12 @@
 }
 
 .eventsList {
+    order: 2;
     margin-top: 4px;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    min-height: 0;
     overflow: hidden;
 }
 
@@ -375,6 +373,8 @@
     font-size: 10px;
     color: var(--text-muted);
     padding-left: 2px;
+    background-color: var(--card-background);
+    border: var(--border);
 }
 
 @media (min-width: 640px) {
@@ -401,6 +401,6 @@
     }
 
     .monthLabel {
-        font-size: 22px;
+        font-size: 14px;
     }
 }
