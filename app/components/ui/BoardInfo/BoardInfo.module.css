@@ -89,9 +89,14 @@
        and then spring back. Stacking keeps the width fixed at one count.
        flex:none stops the row from resizing it either way. */
     display: grid;
-    flex: none;
     justify-items: end;
     font-variant-numeric: tabular-nums;
+    /* A reserved slot, so the bar beside it is the same length in every row
+       and never changes as the figures do. Sized to hold "999/999"; without
+       it the count sized to its text and "2/5" -> "10/10" stole 18px from
+       the track. flex:none keeps the row from resizing it. */
+    flex: none;
+    min-width: 3.5rem;
 }
 
 .count > * {
