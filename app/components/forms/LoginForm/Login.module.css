@@ -1,7 +1,8 @@
 .form {
     display: flex;
     flex-direction: column;
-    width: 450px;
+    width: 100%;
+    max-width: 450px;
     padding: 20px 50px;
     border-radius: 20px;
     background-color: var(--primary);
@@ -65,9 +66,14 @@
     padding: 0 70px 0 20px;
 
     box-sizing: border-box;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
+.input:focus {
+    border-color: var(--accent);
+    background-color: var(--background-deep);
+    outline: none;
+}
 
 .input::placeholder {
     color: var(--text-muted);
@@ -94,8 +100,10 @@
     transition: opacity 0.2s ease;
 }
 
-.showPass:hover {
-    opacity: 0.9;
+@media (hover: hover) {
+    .showPass:hover {
+        opacity: 0.9;
+    }
 }
 
 .error {
@@ -147,15 +155,19 @@
     border-radius: 9999px;
     cursor: pointer;
     box-shadow: 1px 1px 0 var(--signin-shadow, lightcoral);
-    transition: all 0.3s ease;
+    transition: box-shadow 0.25s ease, background-color 0.25s ease,
+        color 0.25s ease;
     z-index: 1;
 }
 
+@media (hover: hover) {
+    /* No translate on hover: lifting the button out from under the cursor made
+   :hover flip on and off at the edges, which read as the button shaking. */
 .signIn:hover {
-    box-shadow: 0 4px var(--signin-shadow, lightcoral);
-    transform: translateY(-2px);
-    background-color: var(--accent);
-    color: var(--background);
+        box-shadow: 0 4px 0 var(--signin-shadow, lightcoral);
+        background-color: var(--accent);
+        color: var(--background);
+    }
 }
 
 .divider {
@@ -190,4 +202,16 @@
 
 .link span {
     text-decoration: underline;
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    .form {
+        padding: 20px 22px;
+        margin-top: 16px;
+        gap: 18px;
+    }
+    .title {
+        font-size: 44px;
+    }
 }

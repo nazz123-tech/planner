@@ -35,13 +35,27 @@ export function periodByHour(hour: number): Period {
   return "night";
 }
 
-export function pickRandom<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+/** Tiny string hash so a given seed always resolves to the same option. */
+function hashSeed(seed: string): number {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash * 31 + seed.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
 }
 
-export function getGreeting(hour: number, name: string): string {
+/**
+ * Seeded rather than random: Math.random() during render produced a different
+ * greeting on the server than on the client, which is a hydration mismatch.
+ * Callers vary `seed` when they want a fresh line.
+ */
+export function pickBySeed<T>(arr: T[], seed: string): T {
+  return arr[hashSeed(seed) % arr.length];
+}
+
+export function getGreeting(hour: number, name: string, seed = ""): string {
   const period = periodByHour(hour);
-  return pickRandom(GREETINGS_BY_PERIOD[period](name));
+  return pickBySeed(GREETINGS_BY_PERIOD[period](name), `${period}|${name}|${seed}`);
 }
 
 export function getSubtext({ total, done }: TaskSummary): string {

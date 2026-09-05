@@ -17,8 +17,10 @@
     transition: color 0.15s ease;
 }
 
-.back:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .back:hover {
+        color: var(--primary);
+    }
 }
 
 .fallback {

@@ -12,7 +12,6 @@
 
 }
 
-
 .item {
     display: flex;
     flex-direction: row;
@@ -61,9 +60,14 @@
 }
 
 .progressFill {
+    /* Full width, then scaled down horizontally to show the real figure. The
+       track's overflow:hidden supplies the rounded ends, so no radius here —
+       scaleX would stretch it out of shape. */
+    width: 100%;
     height: 100%;
     background: var(--accent);
-    border-radius: 5px;
+    transform-origin: left center;
+    will-change: transform;
 }
 .emoji{
     font-size: 20px;
@@ -76,9 +80,22 @@
     padding: 2px 5px;
     border-radius: 10px;
 }
-.count{
+.count {
     font-size: 12px;
     color: var(--text-muted);
+    /* The old and new counts overlap in a single grid cell while one swaps
+       for the other. Left in normal flow they briefly sat side by side, which
+       widened this box, squeezed .itemInfo and made the progress bar shrink
+       and then spring back. Stacking keeps the width fixed at one count.
+       flex:none stops the row from resizing it either way. */
+    display: grid;
+    flex: none;
+    justify-items: end;
+    font-variant-numeric: tabular-nums;
+}
+
+.count > * {
+    grid-area: 1 / 1;
 }
 .list {
     display: flex;
@@ -93,4 +110,11 @@
 
 .item:not(:last-child) {
     border-bottom: 1px solid var(--border);
+}
+
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+    .list {
+        max-height: none;
+    }
 }

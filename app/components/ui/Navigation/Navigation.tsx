@@ -21,6 +21,7 @@ import styles from "./Navigation.module.css";
 import { useLayoutEffect, useRef, useState } from "react";
 import Modal from "../Modal/Modal";
 import { CreateForm } from "../../forms/CreateForm/CreateForm";
+import { ReminderToggle } from "../ReminderToggle/ReminderToggle";
 
 export const Navigation = () => {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -60,13 +61,21 @@ export const Navigation = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const fabSlotRef = useRef<HTMLDivElement>(null);
 
-    const W = 1170;
+    // Design width of the pill, and the fallback before the first measure.
+    const DESIGN_W = 1170;
     const H = 70;
     const R = H / 2;
     const fabD = 80;
     const fabR = fabD / 2;
 
-    const [fabCx, setFabCx] = useState(W / 2);
+    /* The pill is drawn with preserveAspectRatio="none", so a fixed viewBox
+       width gets squashed horizontally as the nav narrows. That squashed the
+       FAB's notch into an ellipse — and below roughly 890px the notch came
+       out narrower than the 56px button, so the pill's border cut across it.
+       Tracking the measured width keeps one viewBox unit at one CSS pixel
+       across, so the notch keeps the button's shape at every size. */
+    const [navW, setNavW] = useState(DESIGN_W);
+    const [fabCx, setFabCx] = useState(DESIGN_W / 2);
 
     useLayoutEffect(() => {
         const measure = () => {
@@ -78,9 +87,9 @@ export const Navigation = () => {
             const slotRect = slot.getBoundingClientRect();
             if (!containerRect.width) return;
 
-            const center =
-                slotRect.left + slotRect.width / 2 - containerRect.left;
-            setFabCx((center / containerRect.width) * W);
+            // Both in CSS pixels; the viewBox now uses the same scale.
+            setNavW(containerRect.width);
+            setFabCx(slotRect.left + slotRect.width / 2 - containerRect.left);
         };
 
         measure();
@@ -103,17 +112,17 @@ export const Navigation = () => {
     const dy = Math.abs(H - cy);
     const dx = Math.sqrt(Math.max(fabR * fabR - dy * dy, 0));
 
-    const clampedCx = Math.min(Math.max(fabCx, R + dx), W - R - dx);
+    const clampedCx = Math.min(Math.max(fabCx, R + dx), navW - R - dx);
     const leftX = clampedCx - dx;
     const rightX = clampedCx + dx;
     const largeArc = overlapRatio > 0.5 ? 1 : 0;
 
     const svgPath = `
         M ${R} 0
-        H ${W - R}
-        A ${R} ${R} 0 0 1 ${W} ${R}
+        H ${navW - R}
+        A ${R} ${R} 0 0 1 ${navW} ${R}
         V ${H - R}
-        A ${R} ${R} 0 0 1 ${W - R} ${H}
+        A ${R} ${R} 0 0 1 ${navW - R} ${H}
         H ${rightX}
         A ${fabR} ${fabR} 0 ${largeArc} 0 ${leftX} ${H}
         H ${R}
@@ -127,7 +136,7 @@ export const Navigation = () => {
         <div className={styles.container} ref={containerRef}>
             <svg
                 className={styles.svgBackground}
-                viewBox={`0 0 ${W} ${H}`}
+                viewBox={`0 0 ${navW} ${H}`}
                 preserveAspectRatio="none"
             >
                 <path
@@ -137,7 +146,9 @@ export const Navigation = () => {
                     strokeWidth="1"
                 />
             </svg>
-            <Logo />
+            <div className={styles.brand}>
+                <Logo />
+            </div>
             <nav className={styles.navbar}>
                 {NAV_ITEMS.map((item, index) => {
                     const isActive = pathname === item.href;
@@ -146,11 +157,7 @@ export const Navigation = () => {
                     return (
                         <div
                             key={item.label}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "12px",
-                            }}
+                            className={styles.navItemWrap}
                         >
                             {index === 2 && (
                                 <div
@@ -221,10 +228,15 @@ export const Navigation = () => {
                     );
                 })}
             </nav>
-            <button className={styles.button} onClick={handleLogout}>
-                <LogOut />
-                Logout
-            </button>
+            {/* Grouped so .container keeps three flex children — the FAB
+                position is measured from this layout. */}
+            <div className={styles.rightGroup}>
+                <ReminderToggle />
+                <button className={styles.button} onClick={handleLogout}>
+                    <LogOut />
+                    Logout
+                </button>
+            </div>
             <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
                 <CreateForm
                     onSuccess={() => setModalOpen(false)}

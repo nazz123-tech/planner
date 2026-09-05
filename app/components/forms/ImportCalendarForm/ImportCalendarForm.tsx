@@ -187,6 +187,8 @@ export const ImportCalendarForm = ({
 
     const preview = result?.events.slice(0, PREVIEW_LIMIT) ?? [];
     const hiddenCount = (result?.events.length ?? 0) - preview.length;
+    // Recurring series arrive as one VEVENT and are expanded into an event
+    // per occurrence, so report the occurrences, not the series.
     const recurringCount =
         result?.events.filter((event) => event.recurring).length ?? 0;
     const hasExisting = (categories?.length ?? 0) > 0;
@@ -277,7 +279,7 @@ export const ImportCalendarForm = ({
                         )}
                         {recurringCount > 0 && (
                             <span className={styles.skip}>
-                                {recurringCount} recurring — first date only
+                                {recurringCount} from repeating events
                             </span>
                         )}
                     </div>

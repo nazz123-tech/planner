@@ -14,8 +14,10 @@
     transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
-.swatch:hover {
-    transform: scale(1.1);
+@media (hover: hover) {
+    .swatch:hover {
+        transform: scale(1.1);
+    }
 }
 
 .active {
