@@ -55,7 +55,9 @@ export const TodayTasks = ({ tasks, onCreate }: TodayTasksProps) => {
                                         label={task.title}
                                     />
                                     <motion.span
-                                        className={styles.title}
+                                        className={`${styles.title} ${
+                                            task.isDone ? styles.titleDone : ""
+                                        }`}
                                         animate={{
                                             opacity: task.isDone ? 0.45 : 1,
                                         }}

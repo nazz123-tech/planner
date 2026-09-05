@@ -45,10 +45,12 @@
     transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.dropZone:hover,
+@media (hover: hover) {
+    .dropZone:hover,
 .dropZone:focus-visible {
-    border-color: var(--accent);
-    outline: none;
+        border-color: var(--accent);
+        outline: none;
+    }
 }
 
 .dropZoneActive {
@@ -157,14 +159,18 @@
     transition: background 0.15s ease, color 0.15s ease;
 }
 
-.modeBtn:hover {
-    color: var(--text-primary);
+@media (hover: hover) {
+    .modeBtn:hover {
+        color: var(--text-primary);
+    }
 }
 
-.modeBtnActive,
+@media (hover: hover) {
+    .modeBtnActive,
 .modeBtnActive:hover {
-    background-color: var(--primary);
-    color: var(--text-on-primary);
+        background-color: var(--primary);
+        color: var(--text-on-primary);
+    }
 }
 
 .newBoard {
@@ -282,8 +288,10 @@
     transition: color 0.15s ease;
 }
 
-.reset:hover:not(:disabled) {
-    color: var(--primary);
+@media (hover: hover) {
+    .reset:hover:not(:disabled) {
+        color: var(--primary);
+    }
 }
 
 .reset:disabled {
@@ -312,15 +320,18 @@
     font-size: 15px;
     font-weight: 600;
     width: 139px;
+    max-width: 45%;
     height: 50px;
     border-radius: 9999px;
     transition: all 200ms ease;
     cursor: pointer;
 }
 
-.cancelBtn:hover:not(:disabled) {
-    background-color: var(--text-primary);
-    color: var(--background);
+@media (hover: hover) {
+    .cancelBtn:hover:not(:disabled) {
+        background-color: var(--text-primary);
+        color: var(--background);
+    }
 }
 
 .submitBtn {
@@ -337,8 +348,10 @@
     cursor: pointer;
 }
 
-.submitBtn:hover:not(:disabled) {
-    background-color: var(--accent);
+@media (hover: hover) {
+    .submitBtn:hover:not(:disabled) {
+        background-color: var(--accent);
+    }
 }
 
 .submitBtn:disabled,

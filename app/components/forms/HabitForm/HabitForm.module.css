@@ -132,8 +132,10 @@
         border-color 0.18s ease;
 }
 
-.dayChip:hover {
-    border-color: var(--accent);
+@media (hover: hover) {
+    .dayChip:hover {
+        border-color: var(--accent);
+    }
 }
 
 .dayChipActive {
@@ -157,15 +159,18 @@
     font-size: 15px;
     font-weight: 600;
     width: 139px;
+    max-width: 45%;
     height: 50px;
     border-radius: 9999px;
     transition: all 200ms ease;
     cursor: pointer;
 }
 
-.cancelBtn:hover {
-    background-color: var(--text-primary);
-    color: var(--background);
+@media (hover: hover) {
+    .cancelBtn:hover {
+        background-color: var(--text-primary);
+        color: var(--background);
+    }
 }
 
 .submitBtn {
@@ -181,8 +186,10 @@
     cursor: pointer;
 }
 
-.submitBtn:hover {
-    background-color: var(--accent);
+@media (hover: hover) {
+    .submitBtn:hover {
+        background-color: var(--accent);
+    }
 }
 
 .submitBtn:disabled {

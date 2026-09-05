@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { habitFormSchema, type HabitFormData } from "../schemas";
 import styles from "./HabitForm.module.css";
@@ -25,7 +25,6 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
         register,
         handleSubmit,
         control,
-        watch,
         reset,
         formState: { errors, isSubmitting },
     } = useForm<HabitFormData>({
@@ -39,7 +38,8 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
         },
     });
 
-    const frequencyType = watch("frequencyType");
+    // useWatch (not watch) so React Compiler can still memoize this component.
+    const frequencyType = useWatch({ control, name: "frequencyType" });
 
     const onSubmit = async (data: HabitFormData) => {
         try {

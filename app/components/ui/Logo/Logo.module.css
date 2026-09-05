@@ -6,8 +6,16 @@
      font-size: 32px;
      color: #211C15;
      line-height: 1;
+     /* "planly" must never wrap onto two lines in a 56-76px tall bar. */
+     white-space: nowrap;
      z-index: 50;
  }
+
+ /* Tablet and phone share the bar with icon-only nav plus two actions, so
+    the wordmark steps down instead of squeezing the nav. */
+ 
+
+ 
 
  .planlyLogo .cursor {
      display: inline-block;
@@ -42,3 +50,19 @@
          opacity: 1;
      }
  }
+
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+     .planlyLogo {
+         font-size: 26px;
+     }
+ 
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+     .planlyLogo {
+         font-size: 22px;
+     }
+ 
+}

@@ -1,5 +1,8 @@
 .dashboard{
-    width: 1170px;
+    width: 100%;
+    max-width: 1170px;
+    padding: 0 16px;
+    box-sizing: border-box;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -8,6 +11,32 @@
 .grid{
     display: grid;
     max-width: 1170px;
-        grid-template-columns: auto auto auto;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 20px;
+}
+
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Three widgets in two columns left the third stranded beside an empty
+       cell. Today's tasks is the widget people come to the dashboard for and
+       the one with the longest list, so it takes the full first row and the
+       boards and habits summaries pair up beneath it. Tablet only: desktop
+       fits all three across, and mobile is a single column. */
+    .grid > *:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    .grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .dashboard {
+        gap: 20px;
+    }
 }

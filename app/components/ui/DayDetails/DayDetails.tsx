@@ -1,8 +1,13 @@
+"use client";
 import Link from "next/link";
 import dayjs from "dayjs";
+import { Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 import type { Task } from "@/app/types/task";
 import type { Note } from "@/app/types/note";
 import type { Category } from "@/app/types/category";
+import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
+import { useDeleteNote } from "@/app/hooks/notes/useDeleteNote";
 import styles from "./DayDetails.module.css";
 
 interface DayDetailsProps {
@@ -20,11 +25,14 @@ export const DayDetails = ({
     categories,
     onAdd,
 }: DayDetailsProps) => {
+    const { mutate: deleteTask } = useDeleteTask();
+    const { mutate: deleteNote } = useDeleteNote();
+
     const categoryById = new Map(categories.map((c) => [c.id, c]));
 
     const dayTasks = tasks
         .filter((task) => task.date === date)
-        .sort((a, b) => (a.time ?? "").localeCompare(b.time ?? ""));
+        .sort((a, b) => (a.time || "~").localeCompare(b.time || "~"));
 
     const dayTaskCategoryIds = new Set(
         dayTasks
@@ -40,11 +48,27 @@ export const DayDetails = ({
                     dayTaskCategoryIds.has(note.categoryId)),
         )
         .sort((a, b) => {
-            if (a.date !== b.date) return (a.date ?? "").localeCompare(b.date ?? "");
+            if (a.date !== b.date) {
+                return (a.date ?? "").localeCompare(b.date ?? "");
+            }
             return (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0);
         });
 
     const formattedDate = dayjs(date).format("dddd, D MMMM YYYY");
+
+    const handleDeleteTask = (taskId: string) => {
+        deleteTask(taskId, {
+            onSuccess: () => toast.success("Task deleted"),
+            onError: () => toast.error("Couldn’t delete the task"),
+        });
+    };
+
+    const handleDeleteNote = (noteId: string) => {
+        deleteNote(noteId, {
+            onSuccess: () => toast.success("Note deleted"),
+            onError: () => toast.error("Couldn’t delete the note"),
+        });
+    };
 
     return (
         <div className={styles.container}>
@@ -67,7 +91,7 @@ export const DayDetails = ({
                                 : undefined;
 
                             return (
-                                <li key={task.id}>
+                                <li key={task.id} className={styles.row}>
                                     <Link
                                         href={`/calendar/${task.id}`}
                                         className={styles.task}
@@ -110,6 +134,16 @@ export const DayDetails = ({
                                             </span>
                                         )}
                                     </Link>
+                                    <button
+                                        type="button"
+                                        className={styles.deleteBtn}
+                                        aria-label={`Delete ${task.title}`}
+                                        onClick={() =>
+                                            handleDeleteTask(task.id)
+                                        }
+                                    >
+                                        <Trash2 size={15} />
+                                    </button>
                                 </li>
                             );
                         })}
@@ -133,22 +167,34 @@ export const DayDetails = ({
                                 : undefined;
 
                             return (
-                                <li key={note.id} className={styles.note}>
-                                    <p className={styles.itemTitle}>
-                                        {note.title}
-                                    </p>
-                                    {note.description && (
-                                        <p className={styles.itemDesc}>
-                                            {note.description}
+                                <li key={note.id} className={styles.row}>
+                                    <div className={styles.note}>
+                                        <p className={styles.itemTitle}>
+                                            {note.title}
                                         </p>
-                                    )}
-                                    {category && (
-                                        <span
-                                            className={`${styles.tag} ${styles.tagNote}`}
-                                        >
-                                            {category.emoji} {category.name}
-                                        </span>
-                                    )}
+                                        {note.description && (
+                                            <p className={styles.itemDesc}>
+                                                {note.description}
+                                            </p>
+                                        )}
+                                        {category && (
+                                            <span
+                                                className={`${styles.tag} ${styles.tagNote}`}
+                                            >
+                                                {category.emoji} {category.name}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className={styles.deleteBtn}
+                                        aria-label={`Delete ${note.title}`}
+                                        onClick={() =>
+                                            handleDeleteNote(note.id)
+                                        }
+                                    >
+                                        <Trash2 size={15} />
+                                    </button>
                                 </li>
                             );
                         })}

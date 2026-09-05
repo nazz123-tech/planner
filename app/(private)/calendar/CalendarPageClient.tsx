@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ContinuousCalendar } from "@/app/components/ui/Calendar/Calendar";
 import { useTasks } from "@/app/hooks/tasks/useTasks";
 import { useNotes } from "@/app/hooks/notes/useNotes";
@@ -33,6 +33,31 @@ export default function CalendarPageClient() {
     const [createView, setCreateView] = useState<typeof createModal>(null);
     if (createModal && createModal !== createView) setCreateView(createModal);
 
+    // Stable identities so the calendar's grid memo isn't thrown away on
+    // every Firestore snapshot — that churn is what made dragging stutter.
+    const handleDayClick = useCallback(
+        (day: number, month: number, year: number) =>
+            setDetailsDate(toDateKey(day, month, year)),
+        [],
+    );
+
+    const handleAddClick = useCallback(
+        (day: number, month: number, year: number) =>
+            setCreateModal({ date: toDateKey(day, month, year) }),
+        [],
+    );
+
+    const handleTaskMove = useCallback(
+        (taskId: string, date: string) => {
+            const task = tasks?.find((item) => item.id === taskId);
+            if (!task || task.date === date) return;
+            updateTask({ taskId, data: { date } });
+        },
+        [tasks, updateTask],
+    );
+
+    const handleImportClick = useCallback(() => setImportOpen(true), []);
+
     return (
         <div className={styles.page}>
             <div className={styles.container}>
@@ -40,18 +65,10 @@ export default function CalendarPageClient() {
                     tasks={tasks ?? []}
                     categories={categories ?? []}
                     notes={notes ?? []}
-                    onClick={(day, month, year) =>
-                        setDetailsDate(toDateKey(day, month, year))
-                    }
-                    onAddClick={(day, month, year) =>
-                        setCreateModal({ date: toDateKey(day, month, year) })
-                    }
-                    onTaskMove={(taskId, date) => {
-                        const task = tasks?.find((item) => item.id === taskId);
-                        if (!task || task.date === date) return;
-                        updateTask({ taskId, data: { date } });
-                    }}
-                    onImportClick={() => setImportOpen(true)}
+                    onClick={handleDayClick}
+                    onAddClick={handleAddClick}
+                    onTaskMove={handleTaskMove}
+                    onImportClick={handleImportClick}
                 />
             </div>
 

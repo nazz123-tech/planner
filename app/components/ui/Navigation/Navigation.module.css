@@ -1,6 +1,7 @@
 .container {
     position: relative;
-    width: 1170px;
+    width: 100%;
+    max-width: 1170px;
     height: 76px;
     margin: 20px auto;
     padding: 0 28px;
@@ -9,7 +10,6 @@
     justify-content: space-between;
     margin-bottom: 50px;
 }
-
 
 .svgBackground {
     position: absolute;
@@ -31,6 +31,18 @@
 
 }
 
+.brand {
+    display: flex;
+    align-items: center;
+    /* Without this the logo is squeezed by the nav as space tightens. */
+    flex-shrink: 0;
+}
+
+.navItemWrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
 .fabSlot {
     position: relative;
@@ -60,26 +72,35 @@
         background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.fab:hover {
-    transform: translate(-50%, -50%) scale(1.15);
-    box-shadow: 0 14px 28px -6px rgba(122, 123, 74, 0.65);
+@media (hover: hover) {
+    .fab:hover {
+        transform: translate(-50%, -50%) scale(1.15);
+        box-shadow: 0 14px 28px -6px rgba(122, 123, 74, 0.65);
+    }
 }
 
 .fab:active {
     transform: translate(-50%, -50%) scale(0.95);
 }
 
-/* While a calendar task is being dragged, the create button becomes a
+@media (hover: hover) {
+    /* While a calendar task is being dragged, the create button becomes a
    drop-to-delete target. Compound selectors keep these ahead of .fab:hover. */
 .fab.fabDelete {
-    background: #d64b4b;
-    box-shadow: 0 10px 22px -8px rgba(214, 75, 75, 0.6);
+        background: #d64b4b;
+        box-shadow: 0 10px 22px -8px rgba(214, 75, 75, 0.6);
+    }
 }
 
+@media (hover: hover) {
+    .fab.fabDelete:hover,
 .fab.fabDelete.fabDeleteOver {
-    background: #c53d3d;
-    transform: translate(-50%, -50%) scale(1.2);
-    box-shadow: 0 18px 36px -6px rgba(197, 61, 61, 0.75);
+        background: #c53d3d;
+        /* Same scale as the regular button hover so the FAB never jumps
+        between create and drop-to-delete modes. */
+        transform: translate(-50%, -50%) scale(1.15);
+        box-shadow: 0 14px 28px -6px rgba(197, 61, 61, 0.65);
+    }
 }
 
 .item {
@@ -101,15 +122,19 @@
     transition: all 200ms ease-in-out;
 }
 
-.item:hover {
-    background: var(--accent-hover);
-    color: whitesmoke;
+@media (hover: hover) {
+    .item:hover {
+        background: var(--accent-hover);
+        color: whitesmoke;
+    }
 }
 .icon{
     transition: all 200ms ease-in-out;
 }
-.item:hover .icon {
-    color: whitesmoke;
+@media (hover: hover) {
+    .item:hover .icon {
+        color: whitesmoke;
+    }
 }
 
 .active {
@@ -157,7 +182,138 @@
     transition: all 200ms ease-in-out;
 }
 
-.button:hover {
-    background-color: var(--text-primary);
-    color: var(--background);
+@media (hover: hover) {
+    .button:hover {
+        background-color: var(--text-primary);
+        color: var(--background);
+    }
+}
+.rightGroup {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+/* =========================================================================
+   Tablet — the pill bar still works, labels just cost too much width.
+   ========================================================================= */
+
+/* =========================================================================
+   Phone — stop scaling the desktop bar down and split it in two:
+   a slim top bar for identity/actions, and a fixed bottom tab bar for
+   navigation, which is where thumbs actually reach.
+   ========================================================================= */
+
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+    .container {
+        padding: 0 16px;
+        margin-bottom: 40px;
+    }
+    .itemLabel {
+        display: none;
+    }
+    .item {
+        padding: 14px;
+    }
+    .button {
+        width: 52px;
+        gap: 0;
+        font-size: 0;
+    }
+    .button svg {
+        font-size: 18px;
+    }
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    .container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        width: 100%;
+        max-width: none;
+        height: calc(56px + env(safe-area-inset-top));
+        padding: env(safe-area-inset-top) 14px 0;
+        margin: 0;
+        background: var(--card-background);
+        border-bottom: 1px solid var(--border);
+        justify-content: space-between;
+    }
+
+    /* The notched pill is a desktop shape; the bars draw their own edges. */
+    .svgBackground {
+        display: none;
+    }
+
+    /* Bottom tab bar. position:fixed escapes the header because .container
+       has no transform, so it anchors to the viewport. */
+    .navbar {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        height: calc(62px + env(safe-area-inset-bottom));
+        padding-bottom: env(safe-area-inset-bottom);
+        gap: 0;
+        justify-content: space-around;
+        align-items: center;
+        background: var(--card-background);
+        border-top: 1px solid var(--border);
+    }
+
+    /* Each nav item is wrapped in a div that also holds the FAB slot, which
+       would push the FAB off-centre. display:contents dissolves the wrapper
+       so the slot becomes a real flex child and lands dead centre. */
+    .navItemWrap {
+        display: contents;
+    }
+
+    .item {
+        flex: 1;
+        min-width: 0;
+        min-height: 48px;
+        padding: 8px;
+        justify-content: center;
+    }
+
+    /* The active pill would overlap neighbours in a tab bar. */
+    .highlight {
+        inset: 6px 10px;
+        border-radius: 14px;
+    }
+
+    /* FAB straddles the top edge of the tab bar — the standard placement. */
+    .fabSlot {
+        flex: 0 0 66px;
+        align-self: stretch;
+        width: 66px;
+        height: auto;
+    }
+
+    .fab {
+        top: 0;
+        left: 50%;
+        width: 54px;
+        height: 54px;
+    }
+
+    .rightGroup {
+        gap: 8px;
+    }
+
+    .toggle,
+    .button {
+        width: 40px;
+        height: 40px;
+        min-height: 40px;
+    }
 }

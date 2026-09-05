@@ -1,12 +1,19 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import {
     AnimatePresence,
     motion,
     useReducedMotion,
     type PanInfo,
 } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { TextAlignStart } from "lucide-react";
 import { readableTextColor } from "@/app/lib/color";
 import { useDragTask } from "@/app/components/context/DragTaskContext";
@@ -15,7 +22,12 @@ import type { Task } from "@/app/types/task";
 import type { Note } from "@/app/types/note";
 import type { Category } from "@/app/types/category";
 
-const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/** Column index for a JS weekday (0=Sun..6=Sat) in a Monday-first grid. */
+function mondayFirstIndex(jsWeekday: number): number {
+    return (jsWeekday + 6) % 7;
+}
 const monthNames = [
     "January",
     "February",
@@ -55,6 +67,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
     onImportClick,
 }) => {
     const today = new Date();
+    const router = useRouter();
     const reduceMotion = useReducedMotion();
     const { setDraggingTaskId } = useDragTask();
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -63,14 +76,39 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         year: number;
         dir: number;
     }>(() => ({ year: new Date().getFullYear(), dir: 0 }));
-    const [selectedMonth, setSelectedMonth] = useState<number>(0);
+    const [selectedMonth, setSelectedMonth] = useState<number>(() =>
+        new Date().getMonth(),
+    );
     const [dragTaskId, setDragTaskId] = useState<string | null>(null);
+    // Only on a phone (<=800px) does the container stop being a scroll box and
+    // the document scroll instead, so scrolling and the month observer have to
+    // target the viewport there. Tablet keeps an inner scroll box like desktop
+    // so the nav stays visible, hence this is no longer the <=1280px signal.
+    const [pageScrolls, setPageScrolls] = useState(false);
+    // Separate signal: tablet and phone both drop drag-and-drop.
+    const [touchTier, setTouchTier] = useState(false);
     const [dragOverKey, setDragOverKey] = useState<string | null>(null);
 
     const pendingScrollTargetRef = useRef<{
         month: number;
         day: number;
     } | null>(null);
+
+    useEffect(() => {
+        const scrollMq = window.matchMedia("(max-width: 800px)");
+        const touchMq = window.matchMedia("(max-width: 1280px)");
+        const sync = () => {
+            setPageScrolls(scrollMq.matches);
+            setTouchTier(touchMq.matches);
+        };
+        sync();
+        scrollMq.addEventListener("change", sync);
+        touchMq.addEventListener("change", sync);
+        return () => {
+            scrollMq.removeEventListener("change", sync);
+            touchMq.removeEventListener("change", sync);
+        };
+    }, []);
 
     const monthOptions = monthNames.map((month, index) => ({
         name: month,
@@ -82,6 +120,12 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         for (const task of tasks) {
             const existing = map.get(task.date) ?? [];
             map.set(task.date, [...existing, task]);
+        }
+        for (const list of map.values()) {
+            // Timed tasks in chronological order, undated ones last.
+            list.sort((a, b) =>
+                (a.time || "~").localeCompare(b.time || "~"),
+            );
         }
         return map;
     }, [tasks]);
@@ -103,43 +147,53 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         return map;
     }, [categories]);
 
-    const scrollToDay = (monthIndex: number, dayIndex: number) => {
-        const targetDayIndex = dayRefs.current.findIndex(
-            (ref) =>
-                ref &&
-                ref.getAttribute("data-month") === `${monthIndex}` &&
-                ref.getAttribute("data-day") === `${dayIndex}`,
-        );
+    const scrollToDay = useCallback(
+        (
+            monthIndex: number,
+            dayIndex: number,
+            behavior: ScrollBehavior = "smooth",
+        ) => {
+            const targetDayIndex = dayRefs.current.findIndex(
+                (ref) =>
+                    ref &&
+                    ref.isConnected &&
+                    ref.getAttribute("data-month") === `${monthIndex}` &&
+                    ref.getAttribute("data-day") === `${dayIndex}`,
+            );
 
-        const targetElement = dayRefs.current[targetDayIndex];
+            const targetElement = dayRefs.current[targetDayIndex];
 
-        if (targetDayIndex === -1 || !targetElement) return;
+            if (targetDayIndex === -1 || !targetElement) return false;
 
-        const container = containerRef.current;
-        const elementRect = targetElement.getBoundingClientRect();
-        const is2xl = window.matchMedia("(min-width: 1536px)").matches;
-        const offsetFactor = is2xl ? 3 : 2.5;
+            const container = pageScrolls ? null : containerRef.current;
+            const elementRect = targetElement.getBoundingClientRect();
+            const is2xl = window.matchMedia("(min-width: 1536px)").matches;
+            const offsetFactor = is2xl ? 3 : 2.5;
 
-        if (container) {
-            const containerRect = container.getBoundingClientRect();
-            const offset =
-                elementRect.top -
-                containerRect.top -
-                containerRect.height / offsetFactor +
-                elementRect.height / 2;
-            container.scrollTo({
-                top: container.scrollTop + offset,
-                behavior: "smooth",
-            });
-        } else {
-            const offset =
-                window.scrollY +
-                elementRect.top -
-                window.innerHeight / offsetFactor +
-                elementRect.height / 2;
-            window.scrollTo({ top: offset, behavior: "smooth" });
-        }
-    };
+            if (container) {
+                const containerRect = container.getBoundingClientRect();
+                const offset =
+                    elementRect.top -
+                    containerRect.top -
+                    containerRect.height / offsetFactor +
+                    elementRect.height / 2;
+                container.scrollTo({
+                    top: container.scrollTop + offset,
+                    behavior,
+                });
+            } else {
+                const offset =
+                    window.scrollY +
+                    elementRect.top -
+                    window.innerHeight / offsetFactor +
+                    elementRect.height / 2;
+                window.scrollTo({ top: offset, behavior });
+            }
+
+            return true;
+        },
+        [pageScrolls],
+    );
 
     const goToYear = (updater: (prevYear: number) => number, dir: number) => {
         setYearState((prev) => ({ year: updater(prev.year), dir }));
@@ -193,70 +247,113 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         }
     });
 
-    const handleDayClick = (day: number, month: number, year: number) => {
-        if (!onClick) return;
-        if (month < 0) {
-            onClick(day, 11, year - 1);
-        } else {
-            onClick(day, month, year);
-        }
-    };
+    // Land on today when the calendar first opens, instead of on 1 January.
+    // Retries across a few frames because the grid needs a layout pass first.
+    const didInitialScrollRef = useRef(false);
+    useEffect(() => {
+        if (didInitialScrollRef.current) return;
 
-    const handleAddClick = (
-        e: React.MouseEvent,
-        day: number,
-        month: number,
-        year: number,
-    ) => {
-        e.stopPropagation();
-        onAddClick?.(day, month, year);
-    };
+        const target = new Date();
+        if (year !== target.getFullYear()) return;
 
-    const handleTaskDragStart = (
-        e: React.DragEvent<HTMLDivElement>,
-        taskId: string,
-    ) => {
-        e.dataTransfer.setData("text/plain", taskId);
-        e.dataTransfer.effectAllowed = "move";
-        setDragTaskId(taskId);
-        setDraggingTaskId(taskId);
-    };
+        let frame = 0;
+        let attempts = 0;
 
-    const handleTaskDragEnd = () => {
+        const tryScroll = () => {
+            if (didInitialScrollRef.current) return;
+            const ok = scrollToDay(
+                target.getMonth(),
+                target.getDate(),
+                "auto",
+            );
+            if (ok) {
+                didInitialScrollRef.current = true;
+                setSelectedMonth(target.getMonth());
+            } else if (attempts++ < 10) {
+                frame = requestAnimationFrame(tryScroll);
+            }
+        };
+
+        frame = requestAnimationFrame(tryScroll);
+        return () => cancelAnimationFrame(frame);
+    }, [year, scrollToDay]);
+
+    const handleDayClick = useCallback(
+        (day: number, month: number, year: number) => {
+            if (!onClick) return;
+            if (month < 0) {
+                onClick(day, 11, year - 1);
+            } else {
+                onClick(day, month, year);
+            }
+        },
+        [onClick],
+    );
+
+    const handleAddClick = useCallback(
+        (e: React.MouseEvent, day: number, month: number, year: number) => {
+            e.stopPropagation();
+            onAddClick?.(day, month, year);
+        },
+        [onAddClick],
+    );
+
+    const handleTaskDragStart = useCallback(
+        (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
+            e.dataTransfer.setData("text/plain", taskId);
+            e.dataTransfer.effectAllowed = "move";
+            setDragTaskId(taskId);
+            setDraggingTaskId(taskId);
+        },
+        [setDraggingTaskId],
+    );
+
+    const handleTaskDragEnd = useCallback(() => {
         setDragTaskId(null);
         setDragOverKey(null);
         setDraggingTaskId(null);
-    };
+    }, [setDraggingTaskId]);
 
-    const handleDayDragOver = (
-        e: React.DragEvent<HTMLDivElement>,
-        dateKey: string,
-    ) => {
-        if (!dragTaskId) return;
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-        if (dragOverKey !== dateKey) setDragOverKey(dateKey);
-    };
+    const handleDayDragOver = useCallback(
+        (e: React.DragEvent<HTMLDivElement>, dateKey: string) => {
+            if (!dragTaskId) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            // Functional update keeps this callback off dragOverKey, so the
+            // grid memo isn't rebuilt on every cell the pointer crosses.
+            setDragOverKey((prev) => (prev === dateKey ? prev : dateKey));
+        },
+        [dragTaskId],
+    );
 
-    const handleDayDrop = (
-        e: React.DragEvent<HTMLDivElement>,
-        dateKey: string,
-    ) => {
-        e.preventDefault();
-        const taskId = e.dataTransfer.getData("text/plain") || dragTaskId;
-        setDragTaskId(null);
-        setDragOverKey(null);
-        if (taskId) onTaskMove?.(taskId, dateKey);
-    };
+    const handleDayDrop = useCallback(
+        (e: React.DragEvent<HTMLDivElement>, dateKey: string) => {
+            e.preventDefault();
+            const taskId = e.dataTransfer.getData("text/plain") || dragTaskId;
+            setDragTaskId(null);
+            setDragOverKey(null);
+            setDraggingTaskId(null);
+            if (taskId) onTaskMove?.(taskId, dateKey);
+        },
+        [dragTaskId, onTaskMove, setDraggingTaskId],
+    );
+
+    // HTML5 drag-and-drop has no touch equivalent, and on a phone or tablet a
+    // long-press drag just fights the scroll.
+    const dragEnabled = !!onTaskMove && !touchTier;
 
     const generateCalendar = useMemo(() => {
         const today = new Date();
 
         const daysInYear = (): { month: number; day: number }[] => {
             const daysInYear = [];
-            const startDayOfWeek = new Date(year, 0, 1).getDay();
+            const startDayOfWeek = mondayFirstIndex(
+                new Date(year, 0, 1).getDay(),
+            );
 
-            if (startDayOfWeek < 6) {
+            // Pad the first week with the trailing days of the previous
+            // December so Jan 1 lands in its real weekday column.
+            if (startDayOfWeek > 0) {
                 for (let i = 0; i < startDayOfWeek; i++) {
                     daysInYear.push({
                         month: -1,
@@ -322,18 +419,21 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                         <div
                             key={`${month}-${day}`}
                             ref={(el) => {
-                                dayRefs.current[index] = el;
+                                // Guard against the exiting year-grid clone
+                                // nulling live refs during the AnimatePresence
+                                // transition (kept the month Select in sync).
+                                if (el) dayRefs.current[index] = el;
                             }}
                             data-month={month}
                             data-day={day}
                             onClick={() => handleDayClick(day, month, year)}
                             onDragOver={
-                                onTaskMove && !isOutsideMonth && dateKey
+                                dragEnabled && !isOutsideMonth && dateKey
                                     ? (e) => handleDayDragOver(e, dateKey)
                                     : undefined
                             }
                             onDrop={
-                                onTaskMove && !isOutsideMonth && dateKey
+                                dragEnabled && !isOutsideMonth && dateKey
                                     ? (e) => handleDayDrop(e, dateKey)
                                     : undefined
                             }
@@ -409,11 +509,13 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                             : undefined;
 
                                         const draggable =
-                                            !!onTaskMove && !isOutsideMonth;
+                                            dragEnabled && !isOutsideMonth;
 
                                         return (
                                             <div
                                                 key={task.id}
+                                                role="button"
+                                                tabIndex={0}
                                                 draggable={draggable}
                                                 onDragStart={
                                                     draggable
@@ -429,9 +531,24 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                                         ? handleTaskDragEnd
                                                         : undefined
                                                 }
-                                                onClick={(e) =>
-                                                    e.stopPropagation()
-                                                }
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(
+                                                        `/calendar/${task.id}`,
+                                                    );
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (
+                                                        e.key === "Enter" ||
+                                                        e.key === " "
+                                                    ) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        router.push(
+                                                            `/calendar/${task.id}`,
+                                                        );
+                                                    }
+                                                }}
                                                 className={`${styles.eventPill} ${
                                                     dragTaskId === task.id
                                                         ? styles.dragging
@@ -442,7 +559,20 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                                     color: textColor ?? undefined,
                                                 }}
                                             >
-                                                {task.title}
+                                                {task.time && (
+                                                    <span
+                                                        className={
+                                                            styles.eventTime
+                                                        }
+                                                    >
+                                                        {task.time}
+                                                    </span>
+                                                )}
+                                                <span
+                                                    className={styles.eventTitle}
+                                                >
+                                                    {task.title}
+                                                </span>
                                             </div>
                                         );
                                     })}
@@ -463,10 +593,17 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         tasksByDate,
         categoryColorById,
         onAddClick,
-        onTaskMove,
         dragTaskId,
         dragOverKey,
         noteCountByDate,
+        dragEnabled,
+        router,
+        handleDayClick,
+        handleAddClick,
+        handleDayDragOver,
+        handleDayDrop,
+        handleTaskDragStart,
+        handleTaskDragEnd,
     ]);
 
     useEffect(() => {
@@ -485,20 +622,24 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                 });
             },
             {
-                root: calendarContainer,
-                rootMargin: "-75% 0px -25% 0px",
+                root: pageScrolls ? null : calendarContainer,
+                // -75%/-25% insets sum to 100%, collapsing the detection
+                // band to zero height so crossings were missed and the month
+                // picker went stale. A 10% band in the upper-middle is stable.
+                rootMargin: "-40% 0px -50% 0px",
                 threshold: 0,
             },
         );
 
-        dayRefs.current.forEach((ref) => {
-            if (ref && ref.getAttribute("data-day") === "15") {
-                observer.observe(ref);
-            }
-        });
+        const anchors = calendarContainer
+            ? calendarContainer.querySelectorAll<HTMLElement>(
+                  '[data-day="15"]',
+              )
+            : [];
+        anchors.forEach((anchor) => observer.observe(anchor));
 
         return () => observer.disconnect();
-    }, [year]);
+    }, [year, pageScrolls]);
 
     return (
         <div ref={containerRef} className={styles.container}>

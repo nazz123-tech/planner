@@ -7,3 +7,42 @@
     height: 80vh;
     overflow-y: scroll;
 }
+
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+    /* The calendar scrolls inside its own box rather than scrolling the
+       document, so the nav above it stays on screen alongside the calendar's
+       own sticky header. 136px is the nav's footprint above this box (20px
+       margin + 76px tall + 40px margin); the further 20px keeps the card
+       clear of the bottom edge. Sized so the document itself never scrolls,
+       which also avoids a scroll box inside a scrolling page. */
+    .container {
+        height: calc(100dvh - 156px);
+        max-height: none;
+        overflow-y: auto;
+    }
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    /* A phone is too short to give the calendar a useful inner scroll box, so
+       here the document scrolls and the sticky header rides the viewport. */
+    .container {
+        height: auto;
+        overflow: visible;
+    }
+
+    /* Full-bleed on a phone: the day cells are the cramped part, so the
+       gutters that framed the calendar give their width back to the grid. */
+    .container,
+    .page {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .header {
+        gap: 12px;
+    }
+    .title {
+        font-size: 28px;
+    }
+}

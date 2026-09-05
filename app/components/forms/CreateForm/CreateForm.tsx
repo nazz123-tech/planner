@@ -95,7 +95,7 @@ export const CreateForm = ({
             }
             reset();
             onSuccess();
-        } catch (error) {
+        } catch {
             toast.error("Something went wrong");
         }
     };

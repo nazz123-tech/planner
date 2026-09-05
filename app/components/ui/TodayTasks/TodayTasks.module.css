@@ -12,7 +12,6 @@
     
 }
 
-
 .item{
     display: flex;
     flex-direction: row;
@@ -45,4 +44,40 @@
 
 .title {
     font-size: 14px;
+    /* inline-block so the strike below spans the text box */
+    display: inline-block;
+    position: relative;
+}
+
+/* A drawn line rather than text-decoration: line-through, because a
+   pseudo-element can be animated and so the strike sweeps across the title
+   when the task is ticked instead of appearing all at once. */
+.title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.25s ease;
+}
+
+.titleDone::after {
+    transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .title::after {
+        transition: none;
+    }
+}
+
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+    .list {
+        max-height: none;
+    }
 }

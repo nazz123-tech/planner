@@ -14,12 +14,16 @@ export function useGreeting(
     tasks: TaskSummary,
     refreshKey: string | number = "static",
 ): UseGreetingResult {
+    // Depend on the counts, not the object identity — callers rebuild the
+    // summary object every render, which would re-roll the greeting text.
+    const { total, done } = tasks;
+
     return useMemo(() => {
         const hour = dayjs().hour();
         return {
-            greeting: getGreeting(hour, name),
-            subtext: getSubtext(tasks),
+            greeting: getGreeting(hour, name, String(refreshKey)),
+            subtext: getSubtext({ total, done }),
         };
-    }, [name, tasks.total, tasks.done, refreshKey]);
+    }, [name, total, done, refreshKey]);
 }
 

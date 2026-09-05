@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
     collection,
     deleteDoc,
@@ -40,7 +40,6 @@ async function deleteByCategory(
  */
 export function useDeleteCategory() {
     const { user } = useAuth();
-    const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (categoryId: string) => {

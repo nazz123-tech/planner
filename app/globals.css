@@ -1,3 +1,12 @@
+/* =========================================================================
+   Breakpoint tiers — keep every @media in the app on these two widths, and
+   keep the matchMedia queries in Modal.tsx / Calendar.tsx in step with them.
+
+     mobile   <= 800px    @media (max-width: 800px)
+     tablet   801-1280px  @media (max-width: 1280px)   [also matches mobile]
+     desktop  >  1280px   @media (min-width: 1281px)
+   ========================================================================= */
+
 * {
     box-sizing: border-box;
     padding: 0;
@@ -63,7 +72,11 @@ html {
 html,
 body {
     max-width: 100vw;
-    overflow-x: hidden;
+    /* `clip` rather than `hidden`: hidden turns html/body into scroll
+       containers, which stops position:sticky working once the document
+       (rather than an inner box) is what scrolls. clip still prevents any
+       sideways scroll. */
+    overflow-x: clip;
 }
 
 body {
@@ -76,8 +89,6 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
-
 
 a {
     color: inherit;
@@ -98,3 +109,24 @@ a {
     border-radius: 10px;
 }
 
+/* =========================================================================
+   Phone layout: the nav becomes fixed top + bottom bars, so page content
+   needs to clear both, including the iOS home indicator.
+   ========================================================================= */
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    body {
+        padding-top: calc(56px + env(safe-area-inset-top));
+        padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+
+    /* iOS zooms the viewport when a focused field is under 16px. Every form
+       field here is styled by a CSS module class, which outranks a bare
+       element selector, so this platform workaround has to force it. */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}

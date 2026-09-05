@@ -19,7 +19,9 @@
             position: relative;
             z-index: 1;
 }
-.button:hover{
-    box-shadow: 0 4px var(--signin-shadow, lightcoral);
+@media (hover: hover) {
+    .button:hover {
+        box-shadow: 0 4px var(--signin-shadow, lightcoral);
         transform: translateY(-2px);
+    }
 }

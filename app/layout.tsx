@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 import { AuthProvider } from "./components/context/AuthContext";
@@ -23,6 +23,14 @@ const inter = Inter({
     subsets: ["latin"],
     display: "swap",
 });
+// Without this, mobile browsers lay out at ~980px and zoom the page out.
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+    viewportFit: "cover",
+    themeColor: "#E4D6B4",
+};
+
 export const metadata: Metadata = {
     title: {
         default: "Planly",

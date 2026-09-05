@@ -7,11 +7,9 @@
     scrollbar-width: none;
 }
 
-
-
 .header {
     position: sticky;
-    width: 1170px;
+    width: 100%;
     background: var(--card-background);
     top: 0px;
     z-index: 50;
@@ -23,14 +21,16 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    margin-bottom: 1rem;
+    justify-content: center;
+    gap: 12px;
+    /* Real separation from the weekday names below. */
+    margin-bottom: 20px;
 }
 
 .controls {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 8px;
 }
 
@@ -60,9 +60,11 @@
     transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.select:hover,
+@media (hover: hover) {
+    .select:hover,
 .select:focus-visible {
-    border-color: var(--accent);
+        border-color: var(--accent);
+    }
 }
 
 .selectChevron {
@@ -117,14 +119,18 @@
     transition: background 0.12s ease, color 0.12s ease;
 }
 
-.selectOption:hover {
-    background: var(--background-deep);
+@media (hover: hover) {
+    .selectOption:hover {
+        background: var(--background-deep);
+    }
 }
 
-.selectOptionActive,
+@media (hover: hover) {
+    .selectOptionActive,
 .selectOptionActive:hover {
-    background: var(--primary);
-    color: var(--text-on-primary);
+        background: var(--primary);
+        color: var(--text-on-primary);
+    }
 }
 
 .todayButton {
@@ -142,8 +148,10 @@
     transition: background 0.2s ease;
 }
 
-.todayButton:hover {
-    background: var(--accent);
+@media (hover: hover) {
+    .todayButton:hover {
+        background: var(--accent);
+    }
 }
 
 .importButton {
@@ -164,15 +172,23 @@
     transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.importButton:hover {
-    background: var(--background-deep);
-    border-color: var(--accent);
-    color: var(--accent-deep);
+@media (hover: hover) {
+    .importButton:hover {
+        background: var(--background-deep);
+        border-color: var(--accent);
+        color: var(--accent-deep);
+    }
 }
 
 .yearControls {
     display: flex;
     align-items: center;
+    justify-content: center;
+    /* The year heads the header on its own centred row; the month select and
+       buttons sit under it, which is what opens up the gap above the day
+       names instead of everything colliding on one line. */
+    order: -1;
+    flex: 1 1 100%;
     gap: 6px;
 }
 
@@ -187,9 +203,11 @@
     transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.yearButton:hover {
-    background: var(--background-deep);
-    border-color: var(--accent);
+@media (hover: hover) {
+    .yearButton:hover {
+        background: var(--background-deep);
+        border-color: var(--accent);
+    }
 }
 
 .yearLabel {
@@ -204,7 +222,7 @@
 .weekdaysRow {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    max-width: 1130px;
+    max-width: 100%;
 }
 
 .weekdayLabel {
@@ -219,12 +237,12 @@
 .gridWrap {
     position: relative;
     overflow: hidden;
-    width: 1170px;
+    width: 100%;
 }
 
 .grid {
     padding: 1rem 1.25rem 0;
-    width: 1170px;
+    width: 100%;
 }
 
 .week {
@@ -232,33 +250,54 @@
     width: 100%;
 }
 
+.week:not(:first-child) {
+    margin-top: -1px;
+}
+
 .dayCell {
     position: relative;
-    z-index: 10;
-    margin: -0.5px;
+    z-index: 1;
     aspect-ratio: 1;
-    width: 100%;
-    flex-grow: 1;
+    /* flex-basis:0 + min-width:0 give all seven cells an identical share of
+       the row. With width:100%/flex-grow the automatic minimum size meant a
+       day holding tasks measured wider than an empty one. */
+    flex: 1 1 0;
+    min-width: 0;
     cursor: pointer;
     border-radius: 14px;
     border: 1px solid var(--border, #e2e2e2);
     padding: 6px;
-    transition: border-color 0.15s ease, background-color 0.15s ease,
-        box-shadow 0.15s ease;
+    /* Containment keeps every cell the same size regardless of how many
+       tasks it holds: without it, content overrides aspect-ratio and a busy
+       day makes its whole week row taller. */
+    overflow: hidden;
+    min-height: 0;
+    /* Only colour transitions — layout / shadow changes are instant so
+       sweeping the pointer or a drag across cells doesn't shimmer. */
+    transition: border-color 0.15s ease;
     display: flex;
     flex-direction: column;
 }
 
-.dayCell:hover {
-    z-index: 20;
-    border-color: var(--accent-hover);
+.dayCell + .dayCell {
+    margin-left: -1px;
 }
 
-.dropTarget {
-    z-index: 25;
-    background-color: var(--background-deep);
-    border-color: var(--accent);
-    box-shadow: inset 0 0 0 2px var(--accent);
+@media (hover: hover) {
+    .dayCell:hover {
+        z-index: 2;
+        border-color: var(--accent-hover);
+    }
+}
+
+@media (hover: hover) {
+    .dropTarget,
+.dropTarget:hover {
+        z-index: 3;
+        background-color: var(--background-deep);
+        border-color: var(--accent);
+        box-shadow: inset 0 0 0 2px var(--accent);
+    }
 }
 
 .dayHeader {
@@ -321,13 +360,17 @@
     transition: opacity 0.15s ease, background 0.15s ease;
 }
 
-.dayCell:hover .addButton,
+@media (hover: hover) {
+    .dayCell:hover .addButton,
 .addButton:focus {
-    opacity: 1;
+        opacity: 1;
+    }
 }
 
-.addButton:hover {
-    background: var(--accent);
+@media (hover: hover) {
+    .addButton:hover {
+        background: var(--accent);
+    }
 }
 
 .monthLabel {
@@ -353,17 +396,32 @@
 }
 
 .eventPill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-size: 10px;
     font-weight: 500;
     padding: 2px 6px;
     border-radius: 6px;
-    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
     background-color: var(--background-deep);
     color: var(--text-primary);
     animation: pillIn 0.2s ease;
-    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.eventTime {
+    flex-shrink: 0;
+    font-weight: 700;
+    opacity: 0.8;
+    font-variant-numeric: tabular-nums;
+}
+
+.eventTitle {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .draggablePill {
@@ -374,14 +432,14 @@
     cursor: grabbing;
 }
 
-.draggablePill:hover {
-    box-shadow: 0 2px 6px rgba(34, 48, 31, 0.25);
-    transform: translateY(-1px);
+@media (hover: hover) {
+    .draggablePill:hover {
+        filter: brightness(0.95);
+    }
 }
 
 .dragging {
     opacity: 0.4;
-    transform: scale(0.96);
 }
 
 @keyframes pillIn {
@@ -399,19 +457,28 @@
     font-size: 10px;
     color: var(--text-muted);
     padding-left: 2px;
-    background-color: var(--card-background);
-    border: var(--border);
 }
 
-@media (min-width: 640px) {
-    .dayCell {
-        width: 80px;
-        height: 80px;
-        border-radius: 16px;
+/* ---- Tablet / phone: cells flex, chrome shrinks ---- */
+
+/* =========================================================================
+   Desktop (>1280px) — restore the fixed day-cell metrics. Below this the
+   cells flex to fill the width instead.
+   ========================================================================= */
+@media (min-width: 1281px) {
+    /* Desktop has room for one line: the month select and buttons sit at the
+       left and the year is pushed to the right edge, instead of the year
+       taking a stacked row of its own the way it does on smaller screens. */
+    .headerRow {
+        flex-wrap: nowrap;
+        justify-content: space-between;
     }
-}
 
-@media (min-width: 1024px) {
+    .yearControls {
+        order: 0;
+        flex: 0 0 auto;
+    }
+
     .dayCell {
         width: 144px;
         height: 144px;
@@ -423,10 +490,246 @@
         width: 36px;
         height: 36px;
         font-size: 22px;
-        
     }
 
     .monthLabel {
         font-size: 14px;
+    }
+}
+
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+    /* Fixed height, like desktop, so a cell stays the same size whatever it
+       holds — aspect-ratio ties height to width, which drifts as the tablet
+       viewport changes. */
+    .dayCell {
+        aspect-ratio: auto;
+        height: 118px;
+    }
+
+    .header {
+        padding: 1rem 0.75rem 0;
+    }
+    .headerRow {
+        gap: 0.75rem;
+        margin-bottom: 18px;
+    }
+    .grid {
+        padding: 0.75rem 0.75rem 0;
+    }
+    /* Fills the height its page wrapper sets and scrolls inside it, so the
+       nav stays put while the grid moves. */
+    .container {
+        max-height: 100%;
+        overflow-y: auto;
+    }
+
+    .dayNumber {
+        width: 24px;
+        height: 24px;
+        font-size: 13px;
+    }
+
+    /* Each task reads as a small titled pill, coloured by its category. */
+    .eventsList {
+        margin-top: 4px;
+        gap: 2px;
+    }
+
+    .eventPill {
+        display: flex;
+        align-items: center;
+        /* flex:none — as a flex child the pill would otherwise be squeezed to
+           nothing whenever the cell ran short of room. */
+        flex: none;
+        height: auto;
+        padding: 1px 5px;
+        gap: 0;
+        border-radius: 5px;
+        font-size: 9px;
+        line-height: 1.5;
+        overflow: hidden;
+    }
+
+    /* The title gets the whole pill; a time as well leaves too few characters
+       to read at this width. */
+    .eventTime {
+        display: none;
+    }
+
+    .eventTitle {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* More than the three pills we render collapses to a "+". */
+    .moreLabel {
+        display: block;
+        flex: none;
+        margin-top: 2px;
+        padding: 0;
+        font-size: 0;
+        line-height: 1;
+        text-align: center;
+    }
+
+    .moreLabel::after {
+        content: "+";
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    /* Back to growing with its content: on a phone the document scrolls. */
+    .container {
+        max-height: none;
+        overflow: visible;
+    }
+
+    /* The calendar runs edge to edge on a phone, so rounded corners would be
+       cut off by the screen edge. Square it off, and drop the side borders
+       that would otherwise draw a hairline down each edge of the display. */
+    .container {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    /* Controls get a full row rather than being squeezed onto one line. */
+    .header {
+        padding: 0.9rem 0.6rem 0;
+        border-radius: 0;
+    }
+    .headerRow {
+        gap: 0.6rem;
+        margin-bottom: 16px;
+    }
+    .controls {
+        flex: 1 1 100%;
+    }
+    .selectWrapper {
+        flex: 1;
+    }
+    .select {
+        width: 100%;
+        min-width: 0;
+        height: 42px;
+        padding: 0 14px;
+        font-size: 14px;
+    }
+    .todayButton {
+        height: 42px;
+        padding: 0 16px;
+        font-size: 14px;
+    }
+    /* Icon-only: the label is the first thing worth losing. */
+    .importButton {
+        height: 42px;
+        width: 42px;
+        padding: 0;
+        justify-content: center;
+        gap: 0;
+        font-size: 0;
+    }
+    .yearLabel {
+        font-size: 16px;
+        min-width: 52px;
+    }
+    .weekdayLabel {
+        font-size: 11px;
+        padding: 6px 0;
+    }
+
+    .grid {
+        padding: 0.5rem 0.4rem 0;
+    }
+    .dayCell {
+        aspect-ratio: auto;
+        height: 64px;
+        border-radius: 10px;
+        padding: 3px;
+    }
+    .dayNumber {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+    }
+
+    /* Titles can't fit in a ~46px cell, but "something is on today" still
+       has to read at a glance — collapse each pill to a category dot and
+       let the day sheet carry the detail. */
+    .eventsList {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: 3px;
+        margin-top: 3px;
+    }
+    .eventPill {
+        flex: none;
+        width: 6px;
+        height: 6px;
+        padding: 0;
+        gap: 0;
+        border-radius: 50%;
+        font-size: 0;
+        animation: none;
+    }
+    .eventTime,
+    .eventTitle {
+        display: none;
+    }
+
+    /* Beyond the three dots we render, collapse the remainder to a "+". */
+    .moreLabel {
+        display: block;
+        flex: none;
+        align-self: center;
+        padding: 0;
+        margin: 0;
+        font-size: 0;
+        line-height: 1;
+    }
+
+    .moreLabel::after {
+        content: "+";
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+
+    .noteBadge {
+        width: 6px;
+        height: 6px;
+        padding: 0;
+        gap: 0;
+        border-radius: 50%;
+        background: var(--accent);
+        font-size: 0;
+        overflow: hidden;
+    }
+    .noteBadge svg {
+        display: none;
+    }
+
+    .monthLabel {
+        font-size: 9px;
+    }
+
+    /* Hover-reveal has no equivalent on touch; the day sheet has "+ Add task". */
+    .addButton {
+        display: none;
+    }
+
+    /* The app header is fixed at the top, so the calendar's sticky header
+       has to park below it rather than slide underneath. */
+    .header {
+        top: calc(56px + env(safe-area-inset-top));
     }
 }

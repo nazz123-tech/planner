@@ -67,3 +67,9 @@
     color: var(--text-muted);
 }
 
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+    .list {
+        max-height: none;
+    }
+}
