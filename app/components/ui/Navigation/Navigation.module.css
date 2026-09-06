@@ -1,5 +1,10 @@
 .container {
     position: relative;
+    /* The whole bar sits above page content, so anything it opens — the
+       language menu especially — clears the calendar's sticky header
+       (z-index 50). Without this the bar competed at level 0 and the
+       header covered two of the three language options. */
+    z-index: 100;
     width: 100%;
     max-width: 1170px;
     height: 76px;
@@ -190,7 +195,11 @@
 }
 .rightGroup {
     position: relative;
-    z-index: 1;
+    /* Above the FAB (z-index 2) rather than below it: this group is a
+       stacking context, so it caps whatever the language menu inside can
+       reach, and on a narrow bar the menu would otherwise open under the
+       button. */
+    z-index: 3;
     display: flex;
     flex-direction: row;
     align-items: center;
