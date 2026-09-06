@@ -23,7 +23,7 @@
 }
 
 .sub code {
-    font-family: var(--font-mono);
+    font-family: var(--font-main);
     font-size: 12px;
     background-color: var(--background-deep);
     border-radius: 4px;
@@ -260,7 +260,7 @@
 }
 
 .previewMeta {
-    font-family: var(--font-mono);
+    font-family: var(--font-main);
     font-size: 11px;
     color: var(--text-secondary);
     letter-spacing: 0.02em;

@@ -60,9 +60,21 @@
     /* фон неактивних елементів */
     --disabled-text: rgba(34, 48, 31, 0.4);
     /* текст неактивних елементів */
-    --font-main:var(--font-mono)  ;
+    /* Space Mono for Latin, IBM Plex Mono behind it for Cyrillic. */
+    --font-main: var(--font-mono), var(--font-mono-cyrillic), monospace;
     --font-heading: var(--font-source);
     --font-secondary:var(--font-inter)
+}
+
+/* next/font appends a metric-adjusted *proportional* system face to every
+   font variable, and that face carries no unicode-range — so it claims
+   Cyrillic before IBM Plex Mono is ever reached, and Ukrainian rendered in
+   Helvetica. (Next 16 ignores `adjustFontFallback: false`, verified in the
+   build output.) Leading with the Cyrillic-capable mono when the UI is
+   Ukrainian sidesteps it; `lang` is kept in step by LanguageProvider. The
+   logo is unaffected either way — it embeds its own face. */
+:root:lang(uk) {
+    --font-main: var(--font-mono-cyrillic), var(--font-mono), monospace;
 }
 
 html {
@@ -83,7 +95,7 @@ body {
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    font-family: var(--font-mono);
+    font-family: var(--font-main);
     background-color: var(--background);
     color:var(--text-primary);
     -webkit-font-smoothing: antialiased;

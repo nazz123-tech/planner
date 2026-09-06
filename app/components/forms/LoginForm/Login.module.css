@@ -184,7 +184,7 @@
 }
 
 .divider span {
-    font-family: var(--font-mono);
+    font-family: var(--font-main);
     font-size: 10.5px;
     letter-spacing: 0.1em;
     text-transform: uppercase;

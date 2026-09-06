@@ -1,6 +1,9 @@
 .wrap {
     position: relative;
-    z-index: 1;
+    /* position:relative + z-index makes this a stacking context, so the menu
+       below can only ever stack as high as this wrapper does. At 1 it lost to
+       the FAB (z-index 2) — both have to be raised, not just the menu. */
+    z-index: 100;
     flex-shrink: 0;
     display: inline-flex;
 }
@@ -42,7 +45,7 @@
     position: absolute;
     top: calc(100% + 6px);
     right: 0;
-    z-index: 60;
+    z-index: 100;
     min-width: 150px;
     margin: 0;
     padding: 6px;

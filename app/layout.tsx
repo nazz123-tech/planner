@@ -3,7 +3,12 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "./components/context/AuthContext";
 import { QueryProvider } from "./components/providers/QueryProvider";
-import { Space_Mono, Source_Serif_4, Inter } from "next/font/google";
+import {
+    Space_Mono,
+    Source_Serif_4,
+    Inter,
+    IBM_Plex_Mono,
+} from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { LanguageProvider } from "./i18n/LanguageProvider";
 
@@ -17,7 +22,20 @@ const source = Source_Serif_4({
 
 const spaceMono = Space_Mono({
     variable: "--font-mono",
+    // Space Mono has no Cyrillic — latin, latin-ext and vietnamese only.
     subsets: ["latin"],
+    weight: ["400", "700"],
+    display: "swap",
+});
+
+/**
+ * Carries Cyrillic for --font-main. IBM Plex Mono is the closest Cyrillic
+ * monospace on Google Fonts to Space Mono's slab-terminalled, engineered
+ * look, and IBM drew its Cyrillic to harmonise with the Latin.
+ */
+const plexMono = IBM_Plex_Mono({
+    variable: "--font-mono-cyrillic",
+    subsets: ["latin", "cyrillic"],
     weight: ["400", "700"],
     display: "swap",
 });
@@ -50,7 +68,7 @@ export default function RootLayout({
     return (
         <html
             lang="en"
-            className={`${source.variable} ${inter.variable} ${spaceMono.variable}`}
+            className={`${source.variable} ${inter.variable} ${spaceMono.variable} ${plexMono.variable}`}
         >
             <body>
                 <QueryProvider>

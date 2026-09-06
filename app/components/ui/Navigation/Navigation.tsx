@@ -23,7 +23,7 @@ import Modal from "../Modal/Modal";
 import { CreateForm } from "../../forms/CreateForm/CreateForm";
 import { ReminderToggle } from "../ReminderToggle/ReminderToggle";
 import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
-import { useT } from "@/app/i18n/LanguageProvider";
+import { useLanguage } from "@/app/i18n/LanguageProvider";
 
 export const Navigation = () => {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -48,7 +48,7 @@ export const Navigation = () => {
         });
     };
 
-    const t = useT();
+    const { t, locale } = useLanguage();
 
     const NAV_ITEMS = [
         { href: "/dashboard", icon: LayoutDashboard, label: t("nav.dashboard") },
@@ -64,6 +64,7 @@ export const Navigation = () => {
 
     const containerRef = useRef<HTMLDivElement>(null);
     const fabSlotRef = useRef<HTMLDivElement>(null);
+    const navRef = useRef<HTMLElement>(null);
 
     // Design width of the pill, and the fallback before the first measure.
     const DESIGN_W = 1170;
@@ -100,6 +101,11 @@ export const Navigation = () => {
 
         const observer = new ResizeObserver(measure);
         if (containerRef.current) observer.observe(containerRef.current);
+        // The container is a fixed 1170px, so it never resizes when the nav
+        // labels do. The <nav> is content-sized, so translating "Dashboard"
+        // to "Огляд" shrinks it and slides the FAB slot along — without this
+        // the notch stayed where the English labels had put it.
+        if (navRef.current) observer.observe(navRef.current);
         window.addEventListener("resize", measure);
         document.fonts?.ready.then(measure).catch(() => {});
 
@@ -107,7 +113,8 @@ export const Navigation = () => {
             observer.disconnect();
             window.removeEventListener("resize", measure);
         };
-    }, []);
+        // `locale` re-measures even if the nav happens to keep its width.
+    }, [locale]);
 
     const overlapRatio = 0.3;
     const h = overlapRatio * fabD;
@@ -153,7 +160,7 @@ export const Navigation = () => {
             <div className={styles.brand}>
                 <Logo />
             </div>
-            <nav className={styles.navbar}>
+            <nav className={styles.navbar} ref={navRef}>
                 {NAV_ITEMS.map((item, index) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
