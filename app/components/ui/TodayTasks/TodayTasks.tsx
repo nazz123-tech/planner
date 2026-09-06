@@ -6,11 +6,13 @@ import { EmptyState } from "../EmptyState/EmptyState";
 import { CheckToggle } from "../CheckToggle/CheckToggle";
 
 import { useToggleTaskDone } from "@/app/hooks/tasks/useToggleDone";
+import { useT } from "@/app/i18n/LanguageProvider";
 interface TodayTasksProps {
     tasks: Task[];
     onCreate: () => void;
 }
 export const TodayTasks = ({ tasks, onCreate }: TodayTasksProps) => {
+    const t = useT();
     const { mutate: toggleDone } = useToggleTaskDone();
     return (
         <div className={styles.tasks}>
@@ -24,9 +26,9 @@ export const TodayTasks = ({ tasks, onCreate }: TodayTasksProps) => {
                         <li>
                             <EmptyState
                                 icon="🗒️"
-                                title="Nothing planned today"
-                                hint="Add a task and it will show up right here."
-                                actionLabel="New task"
+                                title={t("today.empty.title")}
+                                hint={t("today.empty.hint")}
+                                actionLabel={t("create.title")}
                                 onAction={onCreate}
                             />
                         </li>

@@ -1,0 +1,116 @@
+.wrap {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    display: inline-flex;
+}
+
+.trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 50px;
+    padding: 0 14px;
+    border-radius: 9999px;
+    border: solid 1px var(--accent);
+    background-color: var(--background-deep);
+    color: var(--text-muted);
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+}
+
+@media (hover: hover) and (min-width: 1281px) {
+    .trigger:hover {
+        color: var(--text-primary);
+    }
+}
+
+.trigger:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.code {
+    letter-spacing: 0.04em;
+}
+
+.menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 60;
+    min-width: 150px;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--card-background);
+    box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.28);
+}
+
+.option {
+    width: 100%;
+    padding: 9px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--font-secondary);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 150ms ease;
+}
+
+@media (hover: hover) and (min-width: 1281px) {
+    .option:hover {
+        background: var(--background-deep);
+    }
+}
+
+.option:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.current {
+    background: var(--primary);
+    color: var(--text-on-primary);
+    font-weight: 600;
+}
+
+@media (hover: hover) and (min-width: 1281px) {
+    .current:hover {
+        background: var(--primary);
+        color: var(--text-on-primary);
+    }
+}
+
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+    .trigger {
+        height: 52px;
+        padding: 0 12px;
+    }
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    .trigger {
+        height: 40px;
+        min-height: 40px;
+        padding: 0 10px;
+        gap: 4px;
+        font-size: 12px;
+    }
+
+    /* Anchored to the right edge of a fixed top bar, so it opens inward. */
+    .menu {
+        min-width: 140px;
+    }
+}

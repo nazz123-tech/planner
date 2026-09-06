@@ -8,6 +8,7 @@ import { useDeleteCategory } from "@/app/hooks/categories/useDeleteCategory";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
 import styles from "./BoardCard.module.css";
 import toast from "react-hot-toast";
+import { useT } from "@/app/i18n/LanguageProvider";
 interface BoardCardProps {
     id: string;
     name: string;
@@ -18,6 +19,7 @@ interface BoardCardProps {
     progress: number;
 }
 export const BoardCard = (board: BoardCardProps) => {
+    const t = useT();
     const router = useRouter();
     const { mutateAsync: deleteCategory, isPending } = useDeleteCategory();
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -57,7 +59,7 @@ export const BoardCard = (board: BoardCardProps) => {
             // "nothing happened", which is what made this hard to diagnose.
             console.error("Failed to delete board", error);
             setConfirmOpen(false);
-            toast.error("Couldn’t delete the board");
+            toast.error(t("toast.boardDeleteFailed"));
         }
     };
     return (

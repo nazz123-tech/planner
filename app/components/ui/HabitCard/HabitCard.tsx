@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import { useDeleteHabit } from "@/app/hooks/habits/useDeleteHabit";
 import { useToggleHabit } from "@/app/hooks/habits/useToggleHabit";
 import { frequencyLabel } from "@/app/shared/habits";
+import { useLanguage } from "@/app/i18n/LanguageProvider";
 import type { HabitWithStats } from "@/app/types/habit";
 import styles from "./HabitCard.module.css";
 import toast from "react-hot-toast";
@@ -14,12 +15,13 @@ interface HabitCardProps {
 }
 
 export const HabitCard = ({ habit }: HabitCardProps) => {
+    const { t, intlLocale } = useLanguage();
     const { mutate: deleteHabit } = useDeleteHabit();
     const { mutate: toggleHabit } = useToggleHabit();
 
     const onDelete = async () => {
         await deleteHabit(habit.id);
-        toast.success("Habit deleted");
+        toast.success(t("toast.habitDeleted"));
     };
 
     return (
@@ -38,7 +40,7 @@ export const HabitCard = ({ habit }: HabitCardProps) => {
                     <button
                         onClick={onDelete}
                         className={styles.deleteBtn}
-                        aria-label="Delete habit"
+                        aria-label={t("habits.deleteAria")}
                     >
                         <Trash size={12} />
                     </button>
@@ -48,7 +50,7 @@ export const HabitCard = ({ habit }: HabitCardProps) => {
             <div className={styles.info}>
                 <h2 className={styles.cardName}>{habit.name}</h2>
                 <p className={styles.subtext}>
-                    {frequencyLabel(habit.frequency)}
+                    {frequencyLabel(habit.frequency, t, intlLocale)}
                     {habit.currentStreak > 0
                         ? ` · ${habit.currentStreak} day streak`
                         : ""}

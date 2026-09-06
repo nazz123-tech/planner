@@ -11,6 +11,7 @@ import { useCreateCategory } from "@/app/hooks/categories/useCreateCategory";
 import { CategoryPicker } from "../../ui/pickers/CategoryPicker/CategoryPicker";
 import type { Task } from "@/app/types/task";
 import styles from "./ImportCalendarForm.module.css";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 interface ImportCalendarFormProps {
     onSuccess: () => void;
@@ -27,6 +28,7 @@ export const ImportCalendarForm = ({
     onSuccess,
     onCancel,
 }: ImportCalendarFormProps) => {
+    const t = useT();
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     const [fileName, setFileName] = useState<string | null>(null);
@@ -155,7 +157,7 @@ export const ImportCalendarForm = ({
         try {
             category = await resolveCategory();
         } catch {
-            toast.error("Couldn't create the board. Please try again.");
+            toast.error(t("toast.boardCreateFailed"));
             return;
         }
 
@@ -181,7 +183,7 @@ export const ImportCalendarForm = ({
             );
             onSuccess();
         } catch {
-            toast.error("Import failed. Please try again.");
+            toast.error(t("toast.importFailed"));
         }
     };
 
@@ -195,7 +197,7 @@ export const ImportCalendarForm = ({
 
     return (
         <div className={styles.container}>
-            <h2 className={styles.heading}>Import calendar</h2>
+            <h2 className={styles.heading}>{t("import.heading")}</h2>
             <p className={styles.sub}>
                 Bring events in from an <code>.ics</code> export (Google
                 Calendar, Apple Calendar, Outlook…). Each event becomes a task.
@@ -321,7 +323,7 @@ export const ImportCalendarForm = ({
                                     onChange={(event) =>
                                         setNewEmoji(event.target.value.slice(0, 2))
                                     }
-                                    aria-label="Board emoji"
+                                    aria-label={t("import.boardEmoji")}
                                     maxLength={2}
                                 />
                                 <input
@@ -331,8 +333,8 @@ export const ImportCalendarForm = ({
                                         setNewName(event.target.value)
                                     }
                                     maxLength={30}
-                                    placeholder="Board name"
-                                    aria-label="Board name"
+                                    placeholder={t("import.boardName")}
+                                    aria-label={t("import.boardName")}
                                 />
                             </div>
                         )}

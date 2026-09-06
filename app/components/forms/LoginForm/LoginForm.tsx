@@ -3,14 +3,15 @@ import { useForm } from "react-hook-form";
 import { LogIn } from "lucide-react";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
-import { loginSchema } from "../schemas";
+import { buildLoginSchema } from "../schemas";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { resetPassword, signInWithEmail } from "@/app/lib/auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { GoogleAuth } from "../../ui/GoogleAuth/GoogleAuth";
 import styles from "./Login.module.css";
 import Link from "next/link";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -22,6 +23,9 @@ export const LoginForm = () => {
     const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
     const [isResetting, setIsResetting] = useState(false);
+    const t = useT();
+    // Rebuilt when the language changes so error text follows it.
+    const schema = useMemo(() => buildLoginSchema(t), [t]);
     const {
         register,
         handleSubmit,
@@ -29,7 +33,7 @@ export const LoginForm = () => {
         getValues,
         formState: { errors },
     } = useForm<LoginFormData>({
-        resolver: yupResolver(loginSchema),
+        resolver: yupResolver(schema),
     });
 
     const handleForgotPassword = async () => {
@@ -38,24 +42,24 @@ export const LoginForm = () => {
         if (!EMAIL_PATTERN.test(email)) {
             setError("email", {
                 type: "manual",
-                message: "Enter your email above to reset your password",
+                message: t("auth.enterEmailAbove"),
             });
-            toast.error("Enter your email above first");
+            toast.error(t("auth.enterEmailFirst"));
             return;
         }
 
         setIsResetting(true);
         try {
             await resetPassword(email);
-            toast.success(`Password reset link sent to ${email}`);
+            toast.success(t("auth.resetSent", { email }));
         } catch (error) {
             const code = (error as { code?: string }).code;
             if (code === "auth/invalid-email") {
-                toast.error("That email address looks invalid");
+                toast.error(t("auth.invalidEmailAddress"));
             } else if (code === "auth/too-many-requests") {
-                toast.error("Too many attempts — try again in a few minutes");
+                toast.error(t("auth.tooManyAttempts"));
             } else {
-                toast.error("Couldn't send the reset email. Try again");
+                toast.error(t("auth.resetFailed"));
             }
         } finally {
             setIsResetting(false);
@@ -70,7 +74,7 @@ export const LoginForm = () => {
                 response?: { data?: { message?: string } };
             };
             const errorMessage =
-                err.response?.data?.message || "User not found";
+                err.response?.data?.message || t("auth.userNotFound");
 
             setError("root.serverError", {
                 type: "manual",
@@ -82,7 +86,7 @@ export const LoginForm = () => {
     return (
         <div className={styles.form}>
             <div className={styles.header}>
-                <h2 className={styles.title}>Login</h2>
+                <h2 className={styles.title}>{t("auth.login.title")}</h2>
             </div>
 
             <form
@@ -90,18 +94,18 @@ export const LoginForm = () => {
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className={styles.field}>
-                    <label className={styles.label}>EMAIL</label>
+                    <label className={styles.label}>{t("auth.email")}</label>
                     <input
                         className={styles.input}
                         {...register("email")}
-                        placeholder="your@email.com"
+                        placeholder={t("auth.emailPlaceholder")}
                     ></input>
                     {errors.email && (
                         <p className={styles.error}>{errors.email.message}</p>
                     )}
                 </div>
                 <div className={styles.field}>
-                    <label className={styles.label}>PASSWORD</label>
+                    <label className={styles.label}>{t("auth.password")}</label>
                     <div className={styles.inputWrapper}>
                         <input
                             className={styles.input}
@@ -129,19 +133,19 @@ export const LoginForm = () => {
                         onClick={handleForgotPassword}
                         disabled={isResetting}
                     >
-                        {isResetting ? "Sending link…" : "Forgot password?"}
+                        {isResetting ? t("auth.sendingLink") : t("auth.forgotPassword")}
                     </button>
                 </div>
 
                 <div className={styles.buttonsGroup}>
                     <button className={styles.signIn} type="submit">
                         <LogIn />
-                        Sign In
+                        {t("auth.signIn")}
                     </button>
                     <span className={styles.line} />
                     <div className={styles.divider}>
                         <div className={styles.line}></div>
-                        <span>OR</span>
+                        <span>{t("auth.or")}</span>
                         <div className={styles.line}></div>
                     </div>
                     <span className={styles.line} />
@@ -149,7 +153,7 @@ export const LoginForm = () => {
                 </div>
             </form>
             <Link className={styles.link} href={"/register"}>
-                First time? <span>Sign up here!</span>
+                {t("auth.firstTime")} <span>{t("auth.signUpHere")}</span>
             </Link>
         </div>
     );

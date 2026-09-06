@@ -3,9 +3,11 @@ import { signInWithGoogle } from "@/app/lib/auth";
 import styles from "./GoogleAuth.module.css";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 export const GoogleAuth = () => {
     const router = useRouter();
+    const t = useT();
 
     const handleClick = async () => {
         try {
@@ -18,7 +20,7 @@ export const GoogleAuth = () => {
 
     return (
         <button className={styles.button} type="button" onClick={handleClick}>
-            <FcGoogle width={20} height={30} /> Sign in using Google
+            <FcGoogle width={20} height={30} /> {t("auth.google")}
         </button>
     );
 };

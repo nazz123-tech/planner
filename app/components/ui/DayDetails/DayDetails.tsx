@@ -9,6 +9,7 @@ import type { Category } from "@/app/types/category";
 import { useDeleteTask } from "@/app/hooks/tasks/useDeleteTask";
 import { useDeleteNote } from "@/app/hooks/notes/useDeleteNote";
 import styles from "./DayDetails.module.css";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 interface DayDetailsProps {
     date: string;
@@ -25,6 +26,7 @@ export const DayDetails = ({
     categories,
     onAdd,
 }: DayDetailsProps) => {
+    const t = useT();
     const { mutate: deleteTask } = useDeleteTask();
     const { mutate: deleteNote } = useDeleteNote();
 
@@ -58,28 +60,28 @@ export const DayDetails = ({
 
     const handleDeleteTask = (taskId: string) => {
         deleteTask(taskId, {
-            onSuccess: () => toast.success("Task deleted"),
-            onError: () => toast.error("Couldn’t delete the task"),
+            onSuccess: () => t("toast.taskDeleted"),
+            onError: () => toast.error(t("toast.taskDeleteFailed")),
         });
     };
 
     const handleDeleteNote = (noteId: string) => {
         deleteNote(noteId, {
-            onSuccess: () => toast.success("Note deleted"),
-            onError: () => toast.error("Couldn’t delete the note"),
+            onSuccess: () => t("toast.noteDeleted"),
+            onError: () => toast.error(t("toast.noteDeleteFailed")),
         });
     };
 
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <span className={styles.kicker}>Day overview</span>
+                <span className={styles.kicker}>{t("day.overview")}</span>
                 <h2 className={styles.title}>{formattedDate}</h2>
             </header>
 
             <section className={styles.section}>
                 <div className={styles.sectionHead}>
-                    <h3 className={styles.sectionTitle}>Tasks</h3>
+                    <h3 className={styles.sectionTitle}>{t("day.tasks")}</h3>
                     <span className={styles.count}>{dayTasks.length}</span>
                 </div>
 
@@ -155,7 +157,7 @@ export const DayDetails = ({
 
             <section className={styles.section}>
                 <div className={styles.sectionHead}>
-                    <h3 className={styles.sectionTitle}>Notes</h3>
+                    <h3 className={styles.sectionTitle}>{t("day.notes")}</h3>
                     <span className={styles.count}>{dayNotes.length}</span>
                 </div>
 

@@ -11,6 +11,7 @@ import {
 import { ColorPicker } from "../../ui/pickers/ColorPicker/ColorPicker";
 import { useCreateCategory } from "@/app/hooks/categories/useCreateCategory";
 import toast from "react-hot-toast";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 interface BoardFormProps {
     onSuccess: () => void;
@@ -29,6 +30,7 @@ export const BoardForm = ({
     onCancel,
     onCreated,
 }: BoardFormProps) => {
+    const t = useT();
     const { mutateAsync: createCategory } = useCreateCategory();
 
     const {
@@ -47,15 +49,15 @@ export const BoardForm = ({
             onCreated?.(ref.id);
             reset();
             onSuccess();
-            toast.success("New category created");
+            toast.success(t("toast.boardCreated"));
         } catch {
-            toast.error("Something went wrong");
+            toast.error(t("toast.somethingWrong"));
         }
     };
 
     return (
         <div className={styles.container}>
-            <h2 className={styles.title}>New board</h2>
+            <h2 className={styles.title}>{t("boardForm.title")}</h2>
 
             <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
                 <Controller
@@ -70,7 +72,7 @@ export const BoardForm = ({
                     <input
                         className={styles.input}
                         {...register("name")}
-                        placeholder="Board name..."
+                        placeholder={t("boardForm.namePlaceholder")}
                     />
                     {errors.name && (
                         <p className={styles.error}>{errors.name.message}</p>

@@ -18,12 +18,14 @@ import { useToggleTaskDone } from "@/app/hooks/tasks/useToggleDone";
 import { CategoryPicker } from "@/app/components/ui/pickers/CategoryPicker/CategoryPicker";
 import { getFormattedDate } from "@/app/shared/constants";
 import styles from "./TaskDetails.module.css";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 interface TaskDetailsProps {
     task: Task;
 }
 
 export const TaskDetails = ({ task }: TaskDetailsProps) => {
+    const t = useT();
     const [editing, setEditing] = useState(false);
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const router = useRouter();
@@ -36,10 +38,10 @@ export const TaskDetails = ({ task }: TaskDetailsProps) => {
     const handleDelete = async () => {
         try {
             await deleteTask(task.id);
-            toast.success("Task deleted");
+            toast.success(t("toast.taskDeleted"));
             router.push("/calendar");
         } catch {
-            toast.error("Could not delete task");
+            toast.error(t("toast.taskDeleteFailed"));
             setConfirmingDelete(false);
         }
     };
@@ -76,24 +78,24 @@ export const TaskDetails = ({ task }: TaskDetailsProps) => {
                     time: data.time ?? "",
                 },
             });
-            toast.success("Task updated");
+            toast.success(t("toast.taskUpdated"));
             setEditing(false);
         } catch {
-            toast.error("Could not update task");
+            toast.error(t("toast.taskUpdateFailed"));
         }
     };
 
     if (editing) {
         return (
             <form className={styles.card} onSubmit={handleSubmit(onSubmit)}>
-                <span className={styles.kicker}>Edit task</span>
+                <span className={styles.kicker}>{t("task.editKicker")}</span>
 
                 <div className={styles.field}>
                     <label className={styles.label}>TITLE</label>
                     <input
                         className={styles.input}
                         {...register("title")}
-                        placeholder="Task title..."
+                        placeholder={t("task.titlePlaceholder")}
                     />
                     {errors.title && (
                         <p className={styles.error}>{errors.title.message}</p>
@@ -120,7 +122,7 @@ export const TaskDetails = ({ task }: TaskDetailsProps) => {
                     <textarea
                         className={styles.textarea}
                         {...register("description")}
-                        placeholder="Description..."
+                        placeholder={t("task.descriptionPlaceholder")}
                     />
                 </div>
 
@@ -158,7 +160,7 @@ export const TaskDetails = ({ task }: TaskDetailsProps) => {
 
     return (
         <div className={styles.card}>
-            <span className={styles.kicker}>Task details</span>
+            <span className={styles.kicker}>{t("task.detailsKicker")}</span>
             <h1 className={styles.title}>{task.title}</h1>
 
             <div className={styles.badges}>
@@ -178,14 +180,14 @@ export const TaskDetails = ({ task }: TaskDetailsProps) => {
 
             <dl className={styles.meta}>
                 <div className={styles.metaItem}>
-                    <dt className={styles.metaLabel}>Date</dt>
+                    <dt className={styles.metaLabel}>{t("task.date")}</dt>
                     <dd className={styles.metaValue}>
                         {dayjs(task.date).format("dddd, D MMMM YYYY")}
                     </dd>
                 </div>
                 {task.time && (
                     <div className={styles.metaItem}>
-                        <dt className={styles.metaLabel}>Time</dt>
+                        <dt className={styles.metaLabel}>{t("task.time")}</dt>
                         <dd className={styles.metaValue}>{task.time}</dd>
                     </div>
                 )}

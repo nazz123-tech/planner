@@ -3,18 +3,20 @@ import { BellRing, BellOff } from "lucide-react";
 import toast from "react-hot-toast";
 import { useReminderSetting } from "@/app/hooks/settings/useReminderSetting";
 import styles from "./ReminderToggle.module.css";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 export const ReminderToggle = () => {
     const { enabled, setEnabled, isSaving } = useReminderSetting();
+    const t = useT();
 
     const toggle = () => {
         const next = !enabled;
         setEnabled(next, {
             onSuccess: () =>
                 toast.success(
-                    next ? "Task reminders on" : "Task reminders off",
+                    next ? t("nav.remindersOn") : t("nav.remindersOff"),
                 ),
-            onError: () => toast.error("Couldn’t save that setting"),
+            onError: () => toast.error(t("nav.settingSaveFailed")),
         });
     };
 
@@ -24,12 +26,10 @@ export const ReminderToggle = () => {
             role="switch"
             aria-checked={enabled}
             aria-label={
-                enabled ? "Turn task reminders off" : "Turn task reminders on"
+                enabled ? t("nav.remindersOn") : t("nav.remindersOff")
             }
             title={
-                enabled
-                    ? "Task reminders on — emailed 2 hours before a task"
-                    : "Task reminders off"
+                enabled ? t("nav.remindersHint") : t("nav.remindersOff")
             }
             disabled={isSaving}
             onClick={toggle}

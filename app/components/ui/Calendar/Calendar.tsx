@@ -18,30 +18,16 @@ import { TextAlignStart } from "lucide-react";
 import { readableTextColor } from "@/app/lib/color";
 import { useDragTask } from "@/app/components/context/DragTaskContext";
 import styles from "./Calendar.module.css";
+import { useLanguage } from "@/app/i18n/LanguageProvider";
+import { calendarWeekdays, monthNames as localisedMonths } from "@/app/i18n/dates";
 import type { Task } from "@/app/types/task";
 import type { Note } from "@/app/types/note";
 import type { Category } from "@/app/types/category";
-
-const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 /** Column index for a JS weekday (0=Sun..6=Sat) in a Monday-first grid. */
 function mondayFirstIndex(jsWeekday: number): number {
     return (jsWeekday + 6) % 7;
 }
-const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-];
 
 interface ContinuousCalendarProps {
     tasks: Task[];
@@ -71,6 +57,11 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
     const reduceMotion = useReducedMotion();
     const { setDraggingTaskId } = useDragTask();
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const { t, intlLocale } = useLanguage();
+    // Month and weekday names come from Intl for the active language.
+    const monthNames = useMemo(() => localisedMonths(intlLocale), [intlLocale]);
+    const daysOfWeek = useMemo(() => calendarWeekdays(intlLocale), [intlLocale]);
+
     const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [{ year, dir: yearDir }, setYearState] = useState<{
         year: number;
@@ -449,8 +440,8 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                     {noteCount > 0 && (
                                         <span
                                             className={styles.noteBadge}
-                                            title={`${noteCount} note${noteCount > 1 ? "s" : ""}`}
-                                            aria-label={`${noteCount} note${noteCount > 1 ? "s" : ""}`}
+                                            title={t("calendar.notesOnDay", { count: noteCount })}
+                                            aria-label={t("calendar.notesOnDay", { count: noteCount })}
                                         >
                                             <TextAlignStart size={12} />
                                             {noteCount}
@@ -468,7 +459,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                                     year,
                                                 )
                                             }
-                                            aria-label="Додати задачу"
+                                            aria-label={t("calendar.addTask")}
                                         >
                                             <svg
                                                 viewBox="0 0 24 24"
@@ -578,7 +569,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                     })}
                                     {hiddenCount > 0 && (
                                         <span className={styles.moreLabel}>
-                                            +{hiddenCount} more
+                                            +{hiddenCount}
                                         </span>
                                     )}
                                 </div>
@@ -604,6 +595,8 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
         handleDayDrop,
         handleTaskDragStart,
         handleTaskDragEnd,
+        monthNames,
+        t,
     ]);
 
     useEffect(() => {
@@ -656,7 +649,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                             type="button"
                             className={styles.todayButton}
                         >
-                            Today
+                            {t("calendar.today")}
                         </button>
                         {onImportClick && (
                             <button
@@ -685,7 +678,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                                         strokeLinecap="round"
                                     />
                                 </svg>
-                                Import .ics
+                                {t("calendar.import")}
                             </button>
                         )}
                     </div>
@@ -693,7 +686,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                         <button
                             onClick={handlePrevYear}
                             className={styles.yearButton}
-                            aria-label="Попередній рік"
+                            aria-label={t("calendar.previousYear")}
                         >
                             <svg
                                 viewBox="0 0 24 24"
@@ -714,7 +707,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({
                         <button
                             onClick={handleNextYear}
                             className={styles.yearButton}
-                            aria-label="Наступний рік"
+                            aria-label={t("calendar.nextYear")}
                         >
                             <svg
                                 viewBox="0 0 24 24"

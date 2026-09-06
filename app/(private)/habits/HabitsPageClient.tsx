@@ -6,8 +6,10 @@ import { HabitCard } from "@/app/components/ui/HabitCard/HabitCard";
 import { HabitForm } from "@/app/components/forms/HabitForm/HabitForm";
 import { useHabits } from "@/app/hooks/habits/useHabits";
 import styles from "./page.module.css";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 export default function HabitsPageClient() {
+    const t = useT();
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const { habits } = useHabits();
 
@@ -15,16 +17,16 @@ export default function HabitsPageClient() {
         <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.headerText}>
-                    <h3 className={styles.title}>Habits</h3>
+                    <h3 className={styles.title}>{t("habits.title")}</h3>
                     <p className={styles.subtext}>
-                        Build routines and keep your streaks alive
+                        {t("habits.subtitle")}
                     </p>
                 </div>
                 <button
                     onClick={() => setModalOpen(true)}
                     className={styles.createHabitBtn}
                 >
-                    <Plus /> <span className={styles.btnText}>New habit</span>
+                    <Plus /> <span className={styles.btnText}>{t("habits.new")}</span>
                 </button>
             </div>
 

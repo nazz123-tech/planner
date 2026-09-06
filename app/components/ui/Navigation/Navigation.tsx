@@ -22,6 +22,8 @@ import { useLayoutEffect, useRef, useState } from "react";
 import Modal from "../Modal/Modal";
 import { CreateForm } from "../../forms/CreateForm/CreateForm";
 import { ReminderToggle } from "../ReminderToggle/ReminderToggle";
+import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 export const Navigation = () => {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -41,16 +43,18 @@ export const Navigation = () => {
         setDraggingTaskId(null);
         if (!taskId) return;
         deleteTask(taskId, {
-            onSuccess: () => toast.success("Task deleted"),
-            onError: () => toast.error("Couldn’t delete the task"),
+            onSuccess: () => toast.success(t("toast.taskDeleted")),
+            onError: () => toast.error(t("toast.taskDeleteFailed")),
         });
     };
 
+    const t = useT();
+
     const NAV_ITEMS = [
-        { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-        { href: "/calendar", icon: Calendar, label: "Calendar" },
-        { href: "/boards", icon: Kanban, label: "Boards" },
-        { href: "/habits", icon: CheckSquare, label: "Habits" },
+        { href: "/dashboard", icon: LayoutDashboard, label: t("nav.dashboard") },
+        { href: "/calendar", icon: Calendar, label: t("nav.calendar") },
+        { href: "/boards", icon: Kanban, label: t("nav.boards") },
+        { href: "/habits", icon: CheckSquare, label: t("nav.habits") },
     ];
 
     const handleLogout = async () => {
@@ -178,8 +182,8 @@ export const Navigation = () => {
                                         }`}
                                         aria-label={
                                             isDeleteMode
-                                                ? "Drop a task here to delete it"
-                                                : "Add item"
+                                                ? t("nav.dropToDelete")
+                                                : t("nav.addItem")
                                         }
                                         onDragOver={(event) => {
                                             if (!isDeleteMode) return;
@@ -231,10 +235,11 @@ export const Navigation = () => {
             {/* Grouped so .container keeps three flex children — the FAB
                 position is measured from this layout. */}
             <div className={styles.rightGroup}>
+                <LanguageSwitcher />
                 <ReminderToggle />
                 <button className={styles.button} onClick={handleLogout}>
                     <LogOut />
-                    Logout
+                    {t("nav.logout")}
                 </button>
             </div>
             <Modal open={modalOpen} onClose={() => setModalOpen(false)}>

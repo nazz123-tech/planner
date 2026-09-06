@@ -1,3 +1,5 @@
+import type { TranslationKey } from "@/app/i18n/dictionaries/en";
+
 export type Period = "morning" | "day" | "evening" | "night";
 
 export type TaskSummary = {
@@ -5,27 +7,20 @@ export type TaskSummary = {
   done: number;
 };
 
-const GREETINGS_BY_PERIOD: Record<Period, (name: string) => string[]> = {
-  morning: (name) => [
-    `Good morning, ${name}.`,
-    `Have a great day, ${name}.`,
-    `Up before your tasks, ${name}.`,
-  ],
-  day: (name) => [
-    `Good day, ${name}.`,
-    `Let's keep going, ${name}.`,
-    `Halfway through the day, ${name}.`,
-  ],
-  evening: (name) => [
-    `Good evening, ${name}.`,
-    `Have a nice evening, ${name}.`,
-    `The day's almost done, ${name}.`,
-  ],
-  night: (name) => [
-    `Can't sleep, ${name}?`,
-    `It's late, ${name}.`,
-    `Quiet out there tonight, ${name}.`,
-  ],
+export type Translate = (
+  key: TranslationKey,
+  params?: Record<string, string | number>,
+) => string;
+
+/**
+ * Keys rather than sentences: the wording lives in the dictionaries, so the
+ * seeded pick below still resolves to the same line in every language.
+ */
+const GREETING_KEYS: Record<Period, TranslationKey[]> = {
+  morning: ["greeting.morning.1", "greeting.morning.2", "greeting.morning.3"],
+  day: ["greeting.day.1", "greeting.day.2", "greeting.day.3"],
+  evening: ["greeting.evening.1", "greeting.evening.2", "greeting.evening.3"],
+  night: ["greeting.night.1", "greeting.night.2", "greeting.night.3"],
 };
 
 export function periodByHour(hour: number): Period {
@@ -53,21 +48,29 @@ export function pickBySeed<T>(arr: T[], seed: string): T {
   return arr[hashSeed(seed) % arr.length];
 }
 
-export function getGreeting(hour: number, name: string, seed = ""): string {
+export function getGreeting(
+  t: Translate,
+  hour: number,
+  name: string,
+  seed = "",
+): string {
   const period = periodByHour(hour);
-  return pickBySeed(GREETINGS_BY_PERIOD[period](name), `${period}|${name}|${seed}`);
+  // Seed on the period and name only, so switching language re-renders the
+  // same greeting translated rather than jumping to a different one.
+  const key = pickBySeed(GREETING_KEYS[period], `${period}|${name}|${seed}`);
+  return t(key, { name });
 }
 
-export function getSubtext({ total, done }: TaskSummary): string {
+export function getSubtext(t: Translate, { total, done }: TaskSummary): string {
   if (total === 0) {
-    return "Nothing planned for today — take a breather.";
+    return t("greeting.subtext.none");
   }
   if (done === total) {
-    return "All done. Nice work.";
+    return t("greeting.subtext.allDone");
   }
   const remaining = total - done;
   if (remaining <= 2) {
-    return `Light day — just ${remaining} tasks left.`;
+    return t("greeting.subtext.light", { count: remaining });
   }
-  return `Busy day — ${remaining} tasks ahead.`;
+  return t("greeting.subtext.busy", { count: remaining });
 }

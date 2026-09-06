@@ -5,10 +5,13 @@ import { AuthProvider } from "./components/context/AuthContext";
 import { QueryProvider } from "./components/providers/QueryProvider";
 import { Space_Mono, Source_Serif_4, Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { LanguageProvider } from "./i18n/LanguageProvider";
 
 const source = Source_Serif_4({
     variable: "--font-source",
-    subsets: ["latin"],
+    // "cyrillic" for Ukrainian — without it Cyrillic text falls back to a
+    // system font and the page changes typeface mid-sentence.
+    subsets: ["latin", "cyrillic"],
     display: "swap",
 });
 
@@ -20,7 +23,7 @@ const spaceMono = Space_Mono({
 });
 const inter = Inter({
     variable: "--font-inter",
-    subsets: ["latin"],
+    subsets: ["latin", "cyrillic"],
     display: "swap",
 });
 // Without this, mobile browsers lay out at ~980px and zoom the page out.
@@ -52,8 +55,10 @@ export default function RootLayout({
             <body>
                 <QueryProvider>
                     <AuthProvider>
-                        <Toaster />
-                        <div>{children}</div>
+                        <LanguageProvider>
+                            <Toaster />
+                            <div>{children}</div>
+                        </LanguageProvider>
                     </AuthProvider>
                 </QueryProvider>
             </body>

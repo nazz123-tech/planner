@@ -14,6 +14,7 @@ import Modal from "../../ui/Modal/Modal";
 import { BoardForm } from "../BoardForm/BoardForm";
 import { getFormattedDate, getFormattedTime } from "@/app/shared/constants";
 import toast from "react-hot-toast";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 type FormType = "task" | "note";
 
@@ -32,6 +33,7 @@ export const CreateForm = ({
     lockDate = false,
     defaultType = "task",
 }: CreateFormProps) => {
+    const t = useT();
     const [formType, setFormType] = useState<FormType>(defaultType);
 
     const [categoryModalOpen, setCategoryModalOpen] = useState(false);
@@ -83,7 +85,7 @@ export const CreateForm = ({
                     categoryId: data.categoryId || undefined,
                     isDone: false,
                 });
-                toast.success("Task created succesfully");
+                toast.success(t("toast.taskCreated"));
             } else {
                 await createNote({
                     title: data.title,
@@ -91,12 +93,12 @@ export const CreateForm = ({
                     categoryId: data.categoryId || undefined,
                     date: defaultDate ?? getFormattedDate(),
                 });
-                toast.success("Note created succesfully");
+                toast.success(t("toast.noteCreated"));
             }
             reset();
             onSuccess();
         } catch {
-            toast.error("Something went wrong");
+            toast.error(t("toast.somethingWrong"));
         }
     };
 
@@ -207,7 +209,7 @@ export const CreateForm = ({
                             height: formType === "note" ? "240px" : "",
                         }}
                         {...register("description")}
-                        placeholder="Description..."
+                        placeholder={t("create.descriptionPlaceholder")}
                     />
                     {errors.description && (
                         <p className={styles.error}>
