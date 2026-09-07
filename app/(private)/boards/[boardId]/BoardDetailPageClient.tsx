@@ -7,6 +7,7 @@ import { useCategories } from "@/app/hooks/categories/useCategories";
 import { useBoardDetail } from "@/app/hooks/boards/useBoards";
 import { useToggleTaskDone } from "@/app/hooks/tasks/useToggleDone";
 import styles from "./page.module.css";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 interface BoardDetailPageClientProps {
     boardId: string;
@@ -15,6 +16,7 @@ interface BoardDetailPageClientProps {
 export default function BoardDetailPageClient({
     boardId,
 }: BoardDetailPageClientProps) {
+    const t = useT();
     const { data: categories } = useCategories();
     const { tasks, notes } = useBoardDetail(boardId);
     const { mutate: toggleDone } = useToggleTaskDone();
@@ -54,7 +56,7 @@ export default function BoardDetailPageClient({
                             <span className={styles.emoji}>{board.emoji}</span>
                         </div>
                         <div className={styles.headerText}>
-                            <span className={styles.kicker}>Board</span>
+                            <span className={styles.kicker}>{t("nav.boards")}</span>
                             <h1 className={styles.title}>{board.name}</h1>
                             <p className={styles.metaLine}>
                                 {doneCount}/{tasks.length} tasks done ·{" "}
@@ -66,7 +68,7 @@ export default function BoardDetailPageClient({
 
                     <section className={styles.section}>
                         <div className={styles.sectionHead}>
-                            <h2 className={styles.sectionTitle}>Tasks</h2>
+                            <h2 className={styles.sectionTitle}>{t("boards.tasks")}</h2>
                             <span className={styles.count}>{tasks.length}</span>
                         </div>
 
@@ -125,7 +127,7 @@ export default function BoardDetailPageClient({
 
                     <section className={styles.section}>
                         <div className={styles.sectionHead}>
-                            <h2 className={styles.sectionTitle}>Notes</h2>
+                            <h2 className={styles.sectionTitle}>{t("boards.notes")}</h2>
                             <span className={styles.count}>{notes.length}</span>
                         </div>
 

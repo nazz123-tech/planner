@@ -5,11 +5,13 @@ import dayjs from "dayjs";
 import { useHabits } from "@/app/hooks/habits/useHabits";
 import { useToggleHabit } from "@/app/hooks/habits/useToggleHabit";
 import { frequencyLabel, isScheduledOn } from "@/app/shared/habits";
+import { useLanguage } from "@/app/i18n/LanguageProvider";
 import styles from "./HabitInfo.module.css";
 import { EmptyState } from "../EmptyState/EmptyState";
 import { CheckToggle } from "../CheckToggle/CheckToggle";
 
 export const HabitInfo = () => {
+    const { t, intlLocale } = useLanguage();
     const { habits } = useHabits();
     const { mutate: toggleHabit } = useToggleHabit();
 
@@ -22,7 +24,7 @@ export const HabitInfo = () => {
         <div className={styles.habits}>
             <div className={styles.card}>
                 <ul className={styles.list}>
-                    <span className={styles.sectionLabel}>03 / Habits</span>
+                    <span className={styles.sectionLabel}>{t("dashboard.habits")}</span>
 
                     {todayHabits.length === 0 && (
                         <li>
@@ -67,7 +69,7 @@ export const HabitInfo = () => {
                                         {habit.currentStreak === 1
                                             ? ""
                                             : "s"}{" "}
-                                        · {frequencyLabel(habit.frequency)}
+                                        · {frequencyLabel(habit.frequency, t, intlLocale)}
                                     </span>
                                 </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import css from "./Modal.module.css";
 
@@ -11,8 +11,20 @@ interface ModalProps {
     onClose: () => void;
 }
 
+/** Mobile tier (see globals.css): modal is presented as a bottom sheet. */
+const SHEET_QUERY = "(max-width: 800px)";
+
 export default function Modal({ open, children, onClose }: ModalProps) {
     const reduceMotion = useReducedMotion();
+    const [isSheet, setIsSheet] = useState(false);
+
+    useEffect(() => {
+        const mq = window.matchMedia(SHEET_QUERY);
+        const sync = () => setIsSheet(mq.matches);
+        sync();
+        mq.addEventListener("change", sync);
+        return () => mq.removeEventListener("change", sync);
+    }, []);
 
     const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if (event.target === event.currentTarget) {
@@ -54,18 +66,28 @@ export default function Modal({ open, children, onClose }: ModalProps) {
                 >
                     <motion.div
                         className={css.modal}
+                        // A sheet slides up from the edge it's anchored to;
+                        // scaling is a centred-dialog gesture and reads wrong.
                         initial={
                             reduceMotion
                                 ? { opacity: 0 }
-                                : { opacity: 0, scale: 0.92, y: 16 }
+                                : isSheet
+                                  ? { opacity: 1, y: "100%" }
+                                  : { opacity: 0, scale: 0.92, y: 16 }
                         }
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={
                             reduceMotion
                                 ? { opacity: 0 }
-                                : { opacity: 0, scale: 0.96, y: 8 }
+                                : isSheet
+                                  ? { opacity: 1, y: "100%" }
+                                  : { opacity: 0, scale: 0.96, y: 8 }
                         }
-                        transition={{ type: "spring", stiffness: 320, damping: 28 }}
+                        transition={
+                            isSheet
+                                ? { type: "spring", stiffness: 400, damping: 40 }
+                                : { type: "spring", stiffness: 320, damping: 28 }
+                        }
                     >
                         {children}
                     </motion.div>

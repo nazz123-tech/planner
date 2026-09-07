@@ -3,9 +3,11 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import { Loader } from "@/app/components/ui/Loader/Loader";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     const { user, loading } = useAuth();
+    const t = useT();
     const router = useRouter();
 
     useEffect(() => {
@@ -13,11 +15,11 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     }, [user, loading, router]);
 
     if (loading) {
-        return <Loader fullscreen label="Loading your planner…" />;
+        return <Loader fullscreen label={t("loader.loadingPlanner")} />;
     }
 
     if (!user) {
-        return <Loader fullscreen label="Redirecting…" />;
+        return <Loader fullscreen label={t("loader.redirecting")} />;
     }
 
     return <>{children}</>;

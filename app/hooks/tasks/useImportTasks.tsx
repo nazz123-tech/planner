@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
     collection,
     doc,
@@ -7,6 +7,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
 import { useAuth } from "../useAuth";
+import { computeReminderFields } from "@/app/shared/reminders";
 import type { Task } from "@/app/types/task";
 
 // Firestore allows 500 writes per batch; stay comfortably under.
@@ -14,7 +15,6 @@ const BATCH_LIMIT = 450;
 
 export function useImportTasks() {
     const { user } = useAuth();
-    const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (tasks: Omit<Task, "id">[]) => {
@@ -28,6 +28,10 @@ export function useImportTasks() {
                 for (const task of tasks.slice(i, i + BATCH_LIMIT)) {
                     batch.set(doc(tasksCol), {
                         ...task,
+                        // Imported tasks get reminders too — without these
+                        // fields the sweep can never match them.
+                        ...computeReminderFields(task.date, task.time),
+                        reminderSentAt: null,
                         createdAt: serverTimestamp(),
                     });
                 }

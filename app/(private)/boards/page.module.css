@@ -3,11 +3,12 @@
     max-width: 1170px;
     margin: 0 auto;
 }
-.grid{
+.grid {
     display: grid;
-        grid-template-columns: auto auto auto;
-        gap:20px
-
+    /* Two boards per row at most. minmax(0, 1fr) rather than a bare 1fr so a
+       long board name can't push a column past its share. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
 }
 .header{
     display: flex;
@@ -46,10 +47,15 @@
         overflow: hidden;
         transition: width 0.3s ease;
 }
-.createBoardBtn:hover{
-    gap:4px;
-    width: 120px;
-    
+/* Desktop only. The width-expanding hover is a pointer affordance; on a
+   tablet or phone it either never fires or sticks after a tap, so it is
+   gated on width as well as on a real hovering pointer. */
+@media (hover: hover) and (min-width: 1281px) {
+    .createBoardBtn:hover {
+        gap:4px;
+        width: 120px;
+
+    }
 }
 .btnText{
     max-width: 0;
@@ -59,7 +65,33 @@
     transition: max-width 0.3s ease, opacity 0.2s ease; 
     
 }
-.createBoardBtn:hover .btnText {
-  max-width: 150px; 
-  opacity: 1;
+/* Desktop only. The width-expanding hover is a pointer affordance; on a
+   tablet or phone it either never fires or sticks after a tap, so it is
+   gated on width as well as on a real hovering pointer. */
+@media (hover: hover) and (min-width: 1281px) {
+    .createBoardBtn:hover .btnText {
+        max-width: 150px;
+        opacity: 1;
+    }
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    /* Two columns would leave each card under 170px wide on a phone. */
+    .grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .container,
+    .page {
+        padding-left: 16px;
+        padding-right: 16px;
+        box-sizing: border-box;
+    }
+    .header {
+        gap: 12px;
+    }
+    .title {
+        font-size: 28px;
+    }
 }

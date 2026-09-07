@@ -1,0 +1,74 @@
+.dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px;
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.message {
+    font-family: var(--font-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.cancelBtn {
+    flex: 1;
+    height: 48px;
+    border-radius: 9999px;
+    border: 1px solid var(--accent);
+    background: var(--background-deep);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 200ms ease, color 200ms ease;
+}
+
+@media (hover: hover) {
+    .cancelBtn:hover:not(:disabled) {
+        background: var(--text-primary);
+        color: var(--background);
+    }
+}
+
+.confirmBtn {
+    flex: 1;
+    height: 48px;
+    border-radius: 9999px;
+    border: none;
+    background: #cb3534;
+    color: #fff;
+    font-family: var(--font-main);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 200ms ease;
+}
+
+@media (hover: hover) {
+    .confirmBtn:hover:not(:disabled) {
+        background: #a82b2a;
+    }
+}
+
+.cancelBtn:disabled,
+.confirmBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

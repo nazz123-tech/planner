@@ -1,10 +1,11 @@
 "use client";
 import styles from "./Hero.module.css";
 
-import dayjs from "dayjs";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGreeting } from "@/app/hooks/greetings/useGreetings";
 import { User } from "firebase/auth";
+import { useLanguage } from "@/app/i18n/LanguageProvider";
+import { formatHeroDate } from "@/app/i18n/dates";
 
 interface HeroProps {
     user: User | null;
@@ -13,11 +14,15 @@ interface HeroProps {
     isLoading: boolean;
 }
 export default function Hero({ user, totalTasks, done, isLoading }: HeroProps) {
-    const today = dayjs().format("ddd D MMM");
-    const { greeting, subtext } = useGreeting(user?.displayName ?? "Buddy", {
-        total: totalTasks ?? 0,
-        done: done ?? 0,
-    });
+    const { t, intlLocale } = useLanguage();
+    const today = formatHeroDate(intlLocale, new Date());
+    const { greeting, subtext } = useGreeting(
+        user?.displayName ?? t("greeting.fallbackName"),
+        {
+            total: totalTasks ?? 0,
+            done: done ?? 0,
+        },
+    );
     return (
         <div className={styles.hero}>
             <div className={styles.textBlock}>

@@ -17,8 +17,10 @@
     transition: color 0.15s ease;
 }
 
-.back:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .back:hover {
+        color: var(--primary);
+    }
 }
 
 .fallback {
@@ -126,11 +128,22 @@
     font-weight: 700;
 }
 
+/* Long boards scroll inside their section instead of stretching the page. */
 .list {
     list-style: none;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    /* Room for the row borders/shadows so they aren't clipped mid-scroll. */
+    padding: 2px;
+    margin: -2px;
+}
+
+.list::-webkit-scrollbar {
+    display: none;
 }
 
 .taskRow {
@@ -158,8 +171,10 @@
     transition: background 0.18s ease, border-color 0.18s ease;
 }
 
-.check:hover {
-    border-color: var(--accent);
+@media (hover: hover) {
+    .check:hover {
+        border-color: var(--accent);
+    }
 }
 
 .checkDone {
@@ -177,8 +192,10 @@
     text-decoration: none;
 }
 
-.taskBody:hover .itemTitle {
-    color: var(--accent-deep);
+@media (hover: hover) {
+    .taskBody:hover .itemTitle {
+        color: var(--accent-deep);
+    }
 }
 
 .taskRow[data-done="true"] .itemTitle {
@@ -224,4 +241,18 @@
     font-family: var(--font-secondary);
     font-size: 13px;
     color: var(--text-muted);
+}
+
+/* ---- tablet and below (<= 1280px) ---- */
+@media (max-width: 1280px) {
+    .list {
+        max-height: none;
+        overflow: visible;
+    }
+    .container {
+        padding: 24px 16px 40px;
+    }
+    .card {
+        padding: 20px 16px;
+    }
 }

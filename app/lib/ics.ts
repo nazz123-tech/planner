@@ -125,29 +125,151 @@ interface EventDraft {
     summary?: string;
     description?: string;
     start?: StartValue;
-    recurring: boolean;
+    rrule?: string;
+    exdates: Set<string>;
 }
 
-function finalizeEvent(draft: EventDraft): ImportedEvent | null {
-    const title = draft.summary?.trim();
-    if (!title || !draft.start) return null;
+const MAX_OCCURRENCES = 400;
+/** Cap open-ended rules (no UNTIL/COUNT) so an import can't run away. */
+const DEFAULT_HORIZON_MONTHS = 24;
 
-    const event: ImportedEvent = {
+const WEEKDAY_INDEX: Record<string, number> = {
+    SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6,
+};
+
+interface RecurrenceRule {
+    freq: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+    interval: number;
+    count?: number;
+    /** YYYY-MM-DD */
+    until?: string;
+    /** Weekday indices; empty means "same weekday as DTSTART". */
+    byDay: number[];
+}
+
+function parseRRule(value: string): RecurrenceRule | null {
+    const parts: Record<string, string> = {};
+    for (const chunk of value.split(";")) {
+        const eq = chunk.indexOf("=");
+        if (eq > 0) parts[chunk.slice(0, eq).toUpperCase()] = chunk.slice(eq + 1);
+    }
+
+    const freq = parts.FREQ?.toUpperCase();
+    if (
+        freq !== "DAILY" &&
+        freq !== "WEEKLY" &&
+        freq !== "MONTHLY" &&
+        freq !== "YEARLY"
+    ) {
+        return null;
+    }
+
+    const interval = Math.max(1, Number.parseInt(parts.INTERVAL ?? "1", 10) || 1);
+    const parsedCount = Number.parseInt(parts.COUNT ?? "", 10);
+    const count = Number.isFinite(parsedCount) ? parsedCount : undefined;
+
+    let until: string | undefined;
+    const untilMatch = /^(\d{4})(\d{2})(\d{2})/.exec(parts.UNTIL ?? "");
+    if (untilMatch) {
+        until = `${untilMatch[1]}-${untilMatch[2]}-${untilMatch[3]}`;
+    }
+
+    // BYDAY entries may carry an ordinal prefix (e.g. "-1SU"); the last two
+    // characters are always the weekday.
+    const byDay = (parts.BYDAY ?? "")
+        .split(",")
+        .map((token) => WEEKDAY_INDEX[token.trim().slice(-2).toUpperCase()])
+        .filter((index): index is number => index !== undefined);
+
+    return { freq, interval, count, until, byDay };
+}
+
+/** Every date a rule produces, as YYYY-MM-DD, EXDATEs removed. */
+function expandRecurrence(
+    startDate: string,
+    rule: RecurrenceRule,
+    exdates: Set<string>,
+): string[] {
+    const start = dayjs(startDate);
+    if (!start.isValid()) return [startDate];
+
+    const horizon = rule.until
+        ? dayjs(rule.until)
+        : start.add(DEFAULT_HORIZON_MONTHS, "month");
+    const limit = Math.min(rule.count ?? MAX_OCCURRENCES, MAX_OCCURRENCES);
+    const dates: string[] = [];
+
+    if (rule.freq === "WEEKLY") {
+        const days = rule.byDay.length
+            ? [...new Set(rule.byDay)].sort((a, b) => a - b)
+            : [start.day()];
+        let weekStart = start.subtract(start.day(), "day");
+        // COUNT limits occurrences the rule generates; an EXDATE still
+        // consumes one (RFC 5545), so count generated, not emitted.
+        let generated = 0;
+
+        outer: for (let guard = 0; guard < 520; guard += 1) {
+            for (const day of days) {
+                const occurrence = weekStart.add(day, "day");
+                if (occurrence.isBefore(start, "day")) continue;
+                if (occurrence.isAfter(horizon, "day")) break outer;
+                generated += 1;
+                const key = occurrence.format("YYYY-MM-DD");
+                if (!exdates.has(key)) dates.push(key);
+                if (generated >= limit) break outer;
+            }
+            weekStart = weekStart.add(rule.interval, "week");
+        }
+        return dates;
+    }
+
+    const unit =
+        rule.freq === "DAILY" ? "day" : rule.freq === "MONTHLY" ? "month" : "year";
+    let cursor = start;
+    let generated = 0;
+    while (generated < limit) {
+        if (cursor.isAfter(horizon, "day")) break;
+        generated += 1;
+        const key = cursor.format("YYYY-MM-DD");
+        if (!exdates.has(key)) dates.push(key);
+        cursor = cursor.add(rule.interval, unit);
+    }
+    return dates;
+}
+
+function finalizeEvents(draft: EventDraft): ImportedEvent[] {
+    const title = draft.summary?.trim();
+    if (!title || !draft.start) return [];
+
+    const base: ImportedEvent = {
         title,
         date: draft.start.date,
         allDay: draft.start.allDay,
-        recurring: draft.recurring,
+        recurring: !!draft.rrule,
     };
 
-    if (draft.start.time) event.time = draft.start.time;
-    if (draft.uid) event.uid = draft.uid;
+    if (draft.start.time) base.time = draft.start.time;
+    if (draft.uid) base.uid = draft.uid;
 
     const description = draft.description?.trim();
     if (description) {
-        event.description = description.slice(0, MAX_DESCRIPTION);
+        base.description = description.slice(0, MAX_DESCRIPTION);
     }
 
-    return event;
+    // A recurring series is stored as ONE VEVENT plus an RRULE; calendar apps
+    // expand it for display. Without expanding it here a 12-week series would
+    // import as a single task.
+    const rule = draft.rrule ? parseRRule(draft.rrule) : null;
+    if (!rule) return [base];
+
+    const dates = expandRecurrence(draft.start.date, rule, draft.exdates);
+    if (dates.length <= 1) return [base];
+
+    return dates.map((date, index) =>
+        base.uid
+            ? { ...base, date, uid: `${base.uid}-${index}` }
+            : { ...base, date },
+    );
 }
 
 export function parseIcs(raw: string): IcsParseResult {
@@ -164,15 +286,15 @@ export function parseIcs(raw: string): IcsParseResult {
         const upper = line.toUpperCase();
 
         if (upper === "BEGIN:VEVENT") {
-            draft = { recurring: false };
+            draft = { exdates: new Set<string>() };
             total += 1;
             continue;
         }
 
         if (upper === "END:VEVENT") {
             if (draft) {
-                const event = finalizeEvent(draft);
-                if (event) events.push(event);
+                const expanded = finalizeEvents(draft);
+                if (expanded.length) events.push(...expanded);
                 else skipped += 1;
             }
             draft = null;
@@ -211,7 +333,18 @@ export function parseIcs(raw: string): IcsParseResult {
                 draft.start = parseStart(parsed.value.trim(), parsed.params) ?? undefined;
                 break;
             case "RRULE":
-                draft.recurring = true;
+                draft.rrule = parsed.value.trim();
+                break;
+            case "EXDATE":
+                // Occurrences the user deleted from the series.
+                for (const item of parsed.value.split(",")) {
+                    const match = /^(\d{4})(\d{2})(\d{2})/.exec(item.trim());
+                    if (match) {
+                        draft.exdates.add(
+                            `${match[1]}-${match[2]}-${match[3]}`,
+                        );
+                    }
+                }
                 break;
             default:
                 break;

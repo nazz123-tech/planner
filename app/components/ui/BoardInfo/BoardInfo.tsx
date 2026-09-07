@@ -1,23 +1,26 @@
 "use client";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useBoards } from "@/app/hooks/boards/useBoards";
 import styles from "./BoardInfo.module.css";
 import { EmptyState } from "../EmptyState/EmptyState";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 export const BoardInfo = () => {
+    const t = useT();
     const { boards } = useBoards();
+    const reduceMotion = useReducedMotion();
     return (
         <div className={styles.boards}>
             <div className={styles.card}>
                 <ul className={styles.list}>
-                    <span className={styles.sectionLabel}>02 / Boards</span>
+                    <span className={styles.sectionLabel}>{t("dashboard.boards")}</span>
 
                     {boards.length === 0 && (
                         <li>
                             <EmptyState
                                 icon="🗂️"
-                                title="No boards yet"
-                                hint="Group tasks and notes by creating a board."
+                                title={t("boards.empty.title")}
+                                hint={t("boards.empty.hint")}
                             />
                         </li>
                     )}
@@ -50,17 +53,26 @@ export const BoardInfo = () => {
                                             {board.name}
                                         </p>
                                         <div className={styles.progressTrack}>
+                                            {/* scaleX rather than width: a
+                                                transform is composited, so
+                                                the bar glides instead of
+                                                forcing a layout pass on
+                                                every frame of the spring. */}
                                             <motion.div
                                                 className={styles.progressFill}
                                                 initial={false}
                                                 animate={{
-                                                    width: `${percent}%`,
+                                                    scaleX: percent / 100,
                                                 }}
-                                                transition={{
-                                                    type: "spring",
-                                                    stiffness: 180,
-                                                    damping: 24,
-                                                }}
+                                                transition={
+                                                    reduceMotion
+                                                        ? { duration: 0 }
+                                                        : {
+                                                              type: "spring",
+                                                              stiffness: 180,
+                                                              damping: 24,
+                                                          }
+                                                }
                                             />
                                         </div>
                                     </div>

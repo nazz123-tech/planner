@@ -180,8 +180,10 @@
     transition: background 200ms ease;
 }
 
-.primaryBtn:hover {
-    background: var(--accent);
+@media (hover: hover) {
+    .primaryBtn:hover {
+        background: var(--accent);
+    }
 }
 
 .primaryBtn:disabled {
@@ -203,9 +205,11 @@
     transition: background 200ms ease, color 200ms ease;
 }
 
-.ghostBtn:hover {
-    background: var(--text-primary);
-    color: var(--background);
+@media (hover: hover) {
+    .ghostBtn:hover {
+        background: var(--text-primary);
+        color: var(--background);
+    }
 }
 
 .deleteLink {
@@ -223,8 +227,10 @@
     transition: opacity 0.15s ease;
 }
 
-.deleteLink:hover {
-    opacity: 0.7;
+@media (hover: hover) {
+    .deleteLink:hover {
+        opacity: 0.7;
+    }
 }
 
 .deleteConfirm {
@@ -264,8 +270,10 @@
     transition: background 200ms ease;
 }
 
-.dangerBtn:hover {
-    background: #a82b2a;
+@media (hover: hover) {
+    .dangerBtn:hover {
+        background: #a82b2a;
+    }
 }
 
 .dangerBtn:disabled {

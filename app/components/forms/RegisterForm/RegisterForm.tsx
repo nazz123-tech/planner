@@ -1,14 +1,15 @@
 "use client";
 import { useForm } from "react-hook-form";
-import { registerSchema } from "../schemas";
+import { buildRegisterSchema } from "../schemas";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signUp } from "@/app/lib/auth";
 import { useRouter } from "next/navigation";
 import { GoogleAuth } from "../../ui/GoogleAuth/GoogleAuth";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import styles from "./RegisterForm.module.css";
 import Link from "next/link";
+import { useT } from "@/app/i18n/LanguageProvider";
 export interface RegisterFormData {
     email: string;
     password: string;
@@ -17,13 +18,15 @@ export interface RegisterFormData {
 export const RegisterForm = () => {
     const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
+    const t = useT();
+    const schema = useMemo(() => buildRegisterSchema(t), [t]);
     const {
         register,
         handleSubmit,
         setError,
         formState: { errors, isSubmitting },
     } = useForm<RegisterFormData>({
-        resolver: yupResolver(registerSchema),
+        resolver: yupResolver(schema),
     });
 
     const onSubmit = async (data: RegisterFormData) => {
@@ -35,7 +38,7 @@ export const RegisterForm = () => {
                 response?: { data?: { message?: string } };
             };
             const errorMessage =
-                err.response?.data?.message || "User not found";
+                err.response?.data?.message || t("auth.userNotFound");
 
             setError("root.serverError", {
                 type: "manual",
@@ -47,7 +50,7 @@ export const RegisterForm = () => {
     return (
         <div className={styles.form}>
             <div className={styles.header}>
-                <h2 className={styles.title}>Sign up</h2>
+                <h2 className={styles.title}>{t("auth.register.title")}</h2>
             </div>
 
             <form
@@ -55,11 +58,11 @@ export const RegisterForm = () => {
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className={styles.field}>
-                    <label className={styles.label}>NAME</label>
+                    <label className={styles.label}>{t("auth.name")}</label>
                     <input
                         className={styles.input}
                         {...register("name")}
-                        placeholder="yourname"
+                        placeholder={t("auth.namePlaceholder")}
                     />
                     {errors.name && (
                         <p className={styles.error}>{errors.name.message}</p>
@@ -67,11 +70,11 @@ export const RegisterForm = () => {
                 </div>
 
                 <div className={styles.field}>
-                    <label className={styles.label}>EMAIL</label>
+                    <label className={styles.label}>{t("auth.email")}</label>
                     <input
                         className={styles.input}
                         {...register("email")}
-                        placeholder="your@email.com"
+                        placeholder={t("auth.emailPlaceholder")}
                     />
                     {errors.email && (
                         <p className={styles.error}>{errors.email.message}</p>
@@ -79,7 +82,7 @@ export const RegisterForm = () => {
                 </div>
 
                 <div className={styles.field}>
-                    <label className={styles.label}>PASSWORD</label>
+                    <label className={styles.label}>{t("auth.password")}</label>
                     <div className={styles.inputWrapper}>
                         <input
                             className={styles.input}
@@ -114,11 +117,11 @@ export const RegisterForm = () => {
                         type="submit"
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? "Signing up..." : "Sign Up"}
+                        {isSubmitting ? t("auth.signingUp") : t("auth.signUp")}
                     </button>
                     <div className={styles.divider}>
                         <div className={styles.line} />
-                        <span>OR</span>
+                        <span>{t("auth.or")}</span>
                         <div className={styles.line} />
                     </div>
                     <GoogleAuth />
@@ -126,7 +129,7 @@ export const RegisterForm = () => {
             </form>
 
             <Link className={styles.link} href="/login">
-                Already have an account? <span>Sign in here!</span>
+                {t("auth.haveAccount")} <span>{t("auth.signInHere")}</span>
             </Link>
         </div>
     );

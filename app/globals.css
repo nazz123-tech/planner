@@ -1,3 +1,12 @@
+/* =========================================================================
+   Breakpoint tiers — keep every @media in the app on these two widths, and
+   keep the matchMedia queries in Modal.tsx / Calendar.tsx in step with them.
+
+     mobile   <= 800px    @media (max-width: 800px)
+     tablet   801-1280px  @media (max-width: 1280px)   [also matches mobile]
+     desktop  >  1280px   @media (min-width: 1281px)
+   ========================================================================= */
+
 * {
     box-sizing: border-box;
     padding: 0;
@@ -51,9 +60,21 @@
     /* фон неактивних елементів */
     --disabled-text: rgba(34, 48, 31, 0.4);
     /* текст неактивних елементів */
-    --font-main:var(--font-mono)  ;
+    /* Space Mono for Latin, IBM Plex Mono behind it for Cyrillic. */
+    --font-main: var(--font-mono), var(--font-mono-cyrillic), monospace;
     --font-heading: var(--font-source);
     --font-secondary:var(--font-inter)
+}
+
+/* next/font appends a metric-adjusted *proportional* system face to every
+   font variable, and that face carries no unicode-range — so it claims
+   Cyrillic before IBM Plex Mono is ever reached, and Ukrainian rendered in
+   Helvetica. (Next 16 ignores `adjustFontFallback: false`, verified in the
+   build output.) Leading with the Cyrillic-capable mono when the UI is
+   Ukrainian sidesteps it; `lang` is kept in step by LanguageProvider. The
+   logo is unaffected either way — it embeds its own face. */
+:root:lang(uk) {
+    --font-main: var(--font-mono-cyrillic), var(--font-mono), monospace;
 }
 
 html {
@@ -63,21 +84,23 @@ html {
 html,
 body {
     max-width: 100vw;
-    overflow-x: hidden;
+    /* `clip` rather than `hidden`: hidden turns html/body into scroll
+       containers, which stops position:sticky working once the document
+       (rather than an inner box) is what scrolls. clip still prevents any
+       sideways scroll. */
+    overflow-x: clip;
 }
 
 body {
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    font-family: var(--font-mono);
+    font-family: var(--font-main);
     background-color: var(--background);
     color:var(--text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
-
 
 a {
     color: inherit;
@@ -98,3 +121,24 @@ a {
     border-radius: 10px;
 }
 
+/* =========================================================================
+   Phone layout: the nav becomes fixed top + bottom bars, so page content
+   needs to clear both, including the iOS home indicator.
+   ========================================================================= */
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    body {
+        padding-top: calc(56px + env(safe-area-inset-top));
+        padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+
+    /* iOS zooms the viewport when a focused field is under 16px. Every form
+       field here is styled by a CSS module class, which outranks a bare
+       element selector, so this platform workaround has to force it. */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}

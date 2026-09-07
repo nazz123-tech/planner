@@ -14,8 +14,10 @@
     transition: background 0.18s ease, border-color 0.18s ease;
 }
 
-.box:hover {
-    border-color: var(--accent);
+@media (hover: hover) {
+    .box:hover {
+        border-color: var(--accent);
+    }
 }
 
 .box:focus-visible {
@@ -30,4 +32,19 @@
 
 .tick {
     display: flex;
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    /* Keep the 24px box visually, but expand the tappable area to the ~44px
+       minimum with a transparent overlay so layout is unaffected. */
+    .box {
+        position: relative;
+    }
+
+    .box::after {
+        content: "";
+        position: absolute;
+        inset: -10px;
+    }
 }

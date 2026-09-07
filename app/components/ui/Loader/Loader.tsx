@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import styles from "./Loader.module.css";
+import { useT } from "@/app/i18n/LanguageProvider";
 
 interface LoaderProps {
     /** Cover the whole viewport with a centered spinner. */
@@ -12,6 +13,7 @@ interface LoaderProps {
 
 export const Loader = ({ fullscreen = false, label }: LoaderProps) => {
     const reduceMotion = useReducedMotion();
+    const t = useT();
 
     return (
         <div
@@ -29,7 +31,7 @@ export const Loader = ({ fullscreen = false, label }: LoaderProps) => {
                 }}
             />
             {label && <span className={styles.label}>{label}</span>}
-            <span className={styles.srOnly}>Loading…</span>
+            <span className={styles.srOnly}>{t("loader.loading")}</span>
         </div>
     );
 };

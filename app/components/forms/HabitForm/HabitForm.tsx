@@ -1,15 +1,17 @@
 "use client";
+import { useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { habitFormSchema, type HabitFormData } from "../schemas";
+import { buildHabitFormSchema, type HabitFormData } from "../schemas";
 import styles from "./HabitForm.module.css";
 import {
     EmojiPreview,
     EmojiGrid,
 } from "../../ui/pickers/EmojiPicker/EmojiPicker";
 import { useCreateHabit } from "@/app/hooks/habits/useCreateHabit";
-import { WEEKDAYS } from "@/app/shared/habits";
+import { weekdayOptions } from "@/app/shared/habits";
+import { useLanguage } from "@/app/i18n/LanguageProvider";
 import type { HabitFrequency, WeekDay } from "@/app/types/habit";
 import toast from "react-hot-toast";
 
@@ -19,17 +21,19 @@ interface HabitFormProps {
 }
 
 export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
+    const { t, intlLocale } = useLanguage();
+    const schema = useMemo(() => buildHabitFormSchema(t), [t]);
+    const weekdays = useMemo(() => weekdayOptions(intlLocale), [intlLocale]);
     const { mutateAsync: createHabit } = useCreateHabit();
 
     const {
         register,
         handleSubmit,
         control,
-        watch,
         reset,
         formState: { errors, isSubmitting },
     } = useForm<HabitFormData>({
-        resolver: yupResolver(habitFormSchema),
+        resolver: yupResolver(schema),
         mode: "onTouched",
         defaultValues: {
             name: "",
@@ -39,7 +43,8 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
         },
     });
 
-    const frequencyType = watch("frequencyType");
+    // useWatch (not watch) so React Compiler can still memoize this component.
+    const frequencyType = useWatch({ control, name: "frequencyType" });
 
     const onSubmit = async (data: HabitFormData) => {
         try {
@@ -60,15 +65,15 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
             });
             reset();
             onSuccess();
-            toast.success("New habit created");
+            toast.success(t("toast.habitCreated"));
         } catch {
-            toast.error("Something went wrong");
+            toast.error(t("toast.somethingWrong"));
         }
     };
 
     return (
         <div className={styles.container}>
-            <h2 className={styles.title}>New habit</h2>
+            <h2 className={styles.title}>{t("habitForm.title")}</h2>
 
             <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
                 <Controller
@@ -82,7 +87,7 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
                     <input
                         className={styles.input}
                         {...register("name")}
-                        placeholder="Habit name..."
+                        placeholder={t("habitForm.namePlaceholder")}
                     />
                     {errors.name && (
                         <p className={styles.error}>{errors.name.message}</p>
@@ -107,7 +112,7 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
                 </div>
 
                 <div className={styles.field}>
-                    <label className={styles.label}>REPEAT</label>
+                    <label className={styles.label}>{t("habitForm.repeat")}</label>
                     <Controller
                         name="frequencyType"
                         control={control}
@@ -115,8 +120,8 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
                             <div className={styles.switcher}>
                                 {(
                                     [
-                                        ["daily", "Every day"],
-                                        ["weekdays", "Specific days"],
+                                        ["daily", t("habits.daily")],
+                                        ["weekdays", t("habits.weekdays")],
                                     ] as const
                                 ).map(([value, text]) => (
                                     <button
@@ -157,7 +162,7 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
                         transition={{ duration: 0.22, ease: "easeOut" }}
                         style={{ overflow: "hidden" }}
                     >
-                        <label className={styles.label}>DAYS</label>
+                        <label className={styles.label}>{t("habitForm.days")}</label>
                         <Controller
                             name="days"
                             control={control}
@@ -165,7 +170,7 @@ export const HabitForm = ({ onSuccess, onCancel }: HabitFormProps) => {
                                 const selected = field.value ?? [];
                                 return (
                                     <div className={styles.days}>
-                                        {WEEKDAYS.map((day) => {
+                                        {weekdays.map((day) => {
                                             const active = selected.includes(
                                                 day.value,
                                             );

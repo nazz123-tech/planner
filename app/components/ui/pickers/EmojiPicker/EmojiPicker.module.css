@@ -41,8 +41,10 @@
     align-items: center;
     justify-content: center;
 }
-.option:hover{
-    background-color: var(--background);
+@media (hover: hover) {
+    .option:hover {
+        background-color: var(--background);
+    }
 }
 
 

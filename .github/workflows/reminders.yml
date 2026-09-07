@@ -1,0 +1,23 @@
+name: Task reminders
+on:
+    schedule:
+        - cron: "*/15 * * * *"
+    workflow_dispatch:
+
+jobs:
+    sweep:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Trigger reminder sweep
+              env:
+                  APP_URL: ${{ secrets.APP_URL }}
+                  CRON_SECRET: ${{ secrets.CRON_SECRET }}
+              run: |
+                  status=$(curl -sS -o response.json -w "%{http_code}" \
+                    -H "Authorization: Bearer $CRON_SECRET" \
+                    "$APP_URL/api/reminders")
+                  echo "HTTP $status"
+                  cat response.json
+                  echo
+                  test "$status" = "200"
+
