@@ -12,14 +12,17 @@
     
 }
 
-.item{
+.item {
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 40px;
+    gap: 12px;
+    /* min-height, not height: a fixed 40px box couldn't hold a title that
+       wrapped, so long ones spilled over the row below. Padding is unchanged,
+       so a short title still gives the same 90px row as the sibling cards. */
+    min-height: 40px;
     justify-content: space-between;
     padding: 25px 20px;
-    
 }
 
 .list{
@@ -40,39 +43,46 @@
     flex-direction: row;
     gap: 10px;
     align-items: center;
+    /* Without this the title refuses to shrink and shoves the time out. */
+    min-width: 0;
 }
 
 .title {
     font-size: 14px;
-    /* inline-block so the strike below spans the text box */
-    display: inline-block;
-    position: relative;
+    line-height: 1.35;
+    min-width: 0;
+    /* Two lines is enough for a full imported course name; beyond that one
+       task would own the whole card, so it ellipsises. */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    /* A real line-through rather than a drawn pseudo-element: the pseudo was
+       one absolutely-placed line, which struck only the middle of a title
+       that wrapped. Animating the colour keeps it fading in. */
+    text-decoration: line-through;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.25s ease;
 }
 
-/* A drawn line rather than text-decoration: line-through, because a
-   pseudo-element can be animated and so the strike sweeps across the title
-   when the task is ticked instead of appearing all at once. */
-.title::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: left center;
-    transition: transform 0.25s ease;
-}
-
-.titleDone::after {
-    transform: scaleX(1);
+.titleDone {
+    text-decoration-color: currentColor;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .title::after {
+    .title {
         transition: none;
     }
+}
+
+.time {
+    /* Never squeezed by a long title, and digits keep a constant width so
+       the column doesn't jitter between rows. */
+    flex: none;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
 }
 
 /* ---- tablet and below (<= 1280px) ---- */
