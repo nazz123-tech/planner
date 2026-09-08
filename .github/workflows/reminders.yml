@@ -13,11 +13,28 @@ jobs:
                   APP_URL: ${{ secrets.APP_URL }}
                   CRON_SECRET: ${{ secrets.CRON_SECRET }}
               run: |
-                  status=$(curl -sS -o response.json -w "%{http_code}" \
+                  set -euo pipefail
+
+                  if [ -z "${APP_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+                    echo "::error::APP_URL and CRON_SECRET repo secrets must be set (Settings > Secrets and variables > Actions)."
+                    exit 1
+                  fi
+
+                  # Tolerate a trailing slash on the secret so we don't build //api/reminders.
+                  base="${APP_URL%/}"
+
+                  status=$(curl -sS --max-time 30 -o response.json -w "%{http_code}" \
                     -H "Authorization: Bearer $CRON_SECRET" \
-                    "$APP_URL/api/reminders")
+                    "$base/api/reminders") || {
+                      echo "::error::Could not reach $base/api/reminders — check the APP_URL secret and that the deployment is up."
+                      exit 1
+                    }
+
                   echo "HTTP $status"
                   cat response.json
                   echo
-                  test "$status" = "200"
 
+                  if [ "$status" != "200" ]; then
+                    echo "::error::Reminder sweep returned HTTP $status (see body above)."
+                    exit 1
+                  fi
