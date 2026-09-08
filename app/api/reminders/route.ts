@@ -39,15 +39,19 @@ export async function GET(request: Request) {
     const now = Date.now();
 
     // Admin init and the collection-group query both fail loudly on bad config
-    // (malformed service account, missing index) — report that as JSON rather
-    // than letting the route throw an opaque 500.
+    // (malformed service account) — report that as JSON rather than letting the
+    // route throw an opaque 500.
+    //
+    // Only the `remindAt` range is pushed to Firestore: a single-field filter
+    // needs no composite index, so the sweep works without a firestore.indexes
+    // deploy. `reminderSentAt` and `isDone` are cheap to check in memory — the
+    // window is at most LOOKBACK_MS wide, so this is a handful of docs.
     let db: ReturnType<typeof adminDb>;
     let snapshot;
     try {
         db = adminDb();
         snapshot = await db
             .collectionGroup("tasks")
-            .where("reminderSentAt", "==", null)
             .where("remindAt", ">", now - LOOKBACK_MS)
             .where("remindAt", "<=", now)
             .get();
@@ -72,6 +76,9 @@ export async function GET(request: Request) {
 
         const data = docSnap.data();
         if (data.isDone) continue;
+        // Already reminded — reminderSentAt holds the send timestamp once sent,
+        // and is null (or absent) while the reminder is still pending.
+        if (data.reminderSentAt != null) continue;
 
         const bucket = byUser.get(uid) ?? [];
         bucket.push({
@@ -89,7 +96,8 @@ export async function GET(request: Request) {
         byUser.set(uid, bucket);
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    // Trim a trailing slash so email links don't come out as "…app//calendar".
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/+$/, "");
 
     let sent = 0;
     let skipped = 0;
