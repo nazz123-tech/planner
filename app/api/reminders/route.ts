@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { adminAuth, adminDb } from "@/app/lib/firebaseAdmin";
+import { adminDb } from "@/app/lib/firebaseAdmin";
 import { buildReminderEmail, type DueTask } from "./email";
 import { emailProvider, sendEmail } from "./send";
 
@@ -101,6 +101,7 @@ export async function GET(request: Request) {
 
     let sent = 0;
     let skipped = 0;
+    let noAddress = 0;
     const failures: string[] = [];
 
     for (const [uid, items] of byUser) {
@@ -116,27 +117,37 @@ export async function GET(request: Request) {
 
         try {
             const profile = await db.doc(`users/${uid}`).get();
-            if (profile.exists && profile.data()?.remindersEnabled === false) {
+            const data = profile.data();
+
+            if (profile.exists && data?.remindersEnabled === false) {
                 skipped += items.length;
                 await stamp();
                 continue;
             }
 
-            const user = await adminAuth().getUser(uid);
-            if (!user.email) {
+            // AuthContext mirrors this on sign-in. Absent means the account
+            // hasn't opened the app since that shipped — a temporary state,
+            // so leave the reminder unstamped and let a later sweep send it
+            // rather than silently burning it.
+            const address =
+                typeof data?.email === "string" ? data.email : null;
+            if (!address) {
                 skipped += items.length;
-                await stamp();
+                noAddress += items.length;
                 continue;
             }
 
             const email = buildReminderEmail({
-                name: user.displayName ?? null,
+                name:
+                    typeof data?.displayName === "string"
+                        ? data.displayName
+                        : null,
                 tasks: items.map((item) => item.task),
                 appUrl,
             });
 
             await sendEmail({
-                to: user.email,
+                to: address,
                 subject: email.subject,
                 text: email.text,
                 html: email.html,
@@ -157,6 +168,9 @@ export async function GET(request: Request) {
         recipients: byUser.size,
         sent,
         skipped,
+        // Non-zero means an account hasn't signed in since the address
+        // started being mirrored; those reminders are still pending.
+        noAddress,
         failures,
     });
 }
