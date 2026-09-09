@@ -32,5 +32,15 @@ export async function GET() {
         out.importFirebaseAdminFirestore = describe(e);
     }
 
+    // Does a real Node require() succeed where Turbopack's external shim fails?
+    try {
+        const { createRequire } = await import("node:module");
+        const mod = createRequire(import.meta.url)("firebase-admin/auth");
+        out.nodeRequireFirebaseAdminAuth =
+            typeof mod?.getAuth === "function" ? "ok, getAuth present" : "loaded but no getAuth";
+    } catch (e) {
+        out.nodeRequireFirebaseAdminAuth = describe(e);
+    }
+
     return NextResponse.json(out);
 }
