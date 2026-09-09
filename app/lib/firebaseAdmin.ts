@@ -1,5 +1,4 @@
 import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import type { ServiceAccount } from "firebase-admin/app";
 
@@ -33,4 +32,10 @@ function adminApp() {
 }
 
 export const adminDb = () => getFirestore(adminApp());
-export const adminAuth = () => getAuth(adminApp());
+
+/**
+ * Deliberately no adminAuth here. firebase-admin/auth pulls in jwks-rsa,
+ * which require()s the ESM-only jose; Turbopack's external-module loader
+ * throws ERR_REQUIRE_ESM on it and the whole route module fails to import.
+ * The reminder sweep reads the address off users/{uid} instead.
+ */
