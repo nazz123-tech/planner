@@ -11,6 +11,7 @@ import {
 } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { LanguageProvider } from "./i18n/LanguageProvider";
+import { ServiceWorkerRegistrar } from "./components/pwa/ServiceWorkerRegistrar";
 
 const source = Source_Serif_4({
     variable: "--font-source",
@@ -58,6 +59,40 @@ export const metadata: Metadata = {
         template: "%s · Planly",
     },
     description: "Plan in own way",
+    applicationName: "Planly",
+    manifest: "/manifest.webmanifest",
+
+    /**
+     * iOS doesn't read display/name/icons from the manifest for Add to Home
+     * Screen — it still wants these meta tags. `capable` is what makes the
+     * launched app drop Safari's chrome; without it the icon just opens a
+     * normal browser tab.
+     */
+    appleWebApp: {
+        capable: true,
+        title: "Planly",
+        // The page is cream, so the light bar with dark text matches it.
+        statusBarStyle: "default",
+    },
+
+    /**
+     * Next 16 emits the standardised `mobile-web-app-capable`, which only
+     * Safari 17.4+ honours. iOS before that reads the apple-prefixed name,
+     * and without it the home-screen icon opens an ordinary Safari tab
+     * instead of a chrome-less window.
+     */
+    other: {
+        "apple-mobile-web-app-capable": "yes",
+    },
+
+    icons: {
+        icon: [
+            { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+            { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+            { url: "/icon.svg", type: "image/svg+xml" },
+        ],
+        apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+    },
 };
 
 export default function RootLayout({
@@ -74,6 +109,7 @@ export default function RootLayout({
                 <QueryProvider>
                     <AuthProvider>
                         <LanguageProvider>
+                            <ServiceWorkerRegistrar />
                             <Toaster />
                             <div>{children}</div>
                         </LanguageProvider>

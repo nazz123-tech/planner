@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#E4D6B4" />
+<title>Offline · Planly</title>
+<style>
+    :root {
+        --background: #e4d6b4;
+        --card-background: #ede3c6;
+        --border: #c9b98e;
+        --primary: #2c4a3e;
+        --text-primary: #22301f;
+        --text-secondary: rgba(34, 48, 31, 0.6);
+        --text-on-primary: #e4d6b4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: var(--background);
+        color: var(--text-primary);
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        -webkit-font-smoothing: antialiased;
+    }
+    .card {
+        width: 100%;
+        max-width: 380px;
+        padding: 32px 28px;
+        text-align: center;
+        background: var(--card-background);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+    }
+    .mark { width: 64px; height: 64px; margin: 0 auto 20px; display: block; }
+    h1 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+    p { font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+    button {
+        margin-top: 22px;
+        width: 100%;
+        height: 48px;
+        border: none;
+        border-radius: 9999px;
+        background: var(--primary);
+        color: var(--text-on-primary);
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+    <div class="card">
+        <!-- Inlined, not an <img src>: nothing else is cached, so a
+             referenced file would be a broken image exactly when this page
+             is the one being shown. -->
+        <svg class="mark" viewBox="0 0 512 512" role="img" aria-hidden="true">
+            <rect width="512" height="512" rx="112" fill="#2C4A3E" />
+            <circle cx="224" cy="218" r="74" fill="none" stroke="#E4D6B4" stroke-width="50" />
+            <rect x="126" y="150" width="50" height="246" rx="6" fill="#E4D6B4" />
+            <rect x="345" y="240" width="42" height="96" rx="4" fill="#D97757" />
+        </svg>
+        <h1>You're offline</h1>
+        <p>Planly needs a connection to load your tasks. Your data is safe — reconnect and it will all be here.</p>
+        <button type="button" onclick="location.reload()">Try again</button>
+    </div>
+</body>
+</html>
