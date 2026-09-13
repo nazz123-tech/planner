@@ -11,6 +11,7 @@ import {
 } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { LanguageProvider } from "./i18n/LanguageProvider";
+import { ServiceWorkerRegistrar } from "./components/pwa/ServiceWorkerRegistrar";
 
 const source = Source_Serif_4({
     variable: "--font-source",
@@ -108,6 +109,7 @@ export default function RootLayout({
                 <QueryProvider>
                     <AuthProvider>
                         <LanguageProvider>
+                            <ServiceWorkerRegistrar />
                             <Toaster />
                             <div>{children}</div>
                         </LanguageProvider>
