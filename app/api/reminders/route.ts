@@ -38,23 +38,82 @@ export async function GET(request: Request) {
 
     const now = Date.now();
 
-    // Admin init and the collection-group query both fail loudly on bad config
-    // (malformed service account) — report that as JSON rather than letting the
-    // route throw an opaque 500.
-    //
-    // Only the `remindAt` range is pushed to Firestore: a single-field filter
-    // needs no composite index, so the sweep works without a firestore.indexes
-    // deploy. `reminderSentAt` and `isDone` are cheap to check in memory — the
-    // window is at most LOOKBACK_MS wide, so this is a handful of docs.
+    /*
+     * Walks users and queries each one's own tasks subcollection, rather than
+     * a collectionGroup("tasks") query across all of them.
+     *
+     * A collection-group query needs a collection-group-scoped index even on a
+     * single field — Firestore only creates single-field indexes automatically
+     * at collection scope — so the group form failed in production with
+     * FAILED_PRECONDITION until someone built that index by hand. A range over
+     * one collection uses the automatic index, so this needs no Firestore
+     * configuration at all.
+     *
+     * Walking users is also the honest shape now: since the address comes from
+     * users/{uid}, an account with no profile document could never be emailed
+     * anyway.
+     *
+     * `reminderSentAt` and `isDone` stay in-memory checks: the window is at
+     * most LOOKBACK_MS wide, so this is a handful of documents per user.
+     */
     let db: ReturnType<typeof adminDb>;
-    let snapshot;
+    let profiles;
     try {
         db = adminDb();
-        snapshot = await db
-            .collectionGroup("tasks")
-            .where("remindAt", ">", now - LOOKBACK_MS)
-            .where("remindAt", "<=", now)
-            .get();
+        profiles = (await db.collection("users").get()).docs;
+    } catch (error) {
+        console.error("Reminder sweep could not read users", error);
+        return NextResponse.json(
+            {
+                error: "Could not read users",
+                detail:
+                    error instanceof Error ? error.message : "unknown error",
+            },
+            { status: 500 },
+        );
+    }
+
+    // Grouped by owner so a user with three things due gets one email.
+    const byUser = new Map<string, { id: string; task: DueTask }[]>();
+    const profileById = new Map<string, FirebaseFirestore.DocumentData>();
+    let checked = 0;
+
+    try {
+        for (const profile of profiles) {
+            const uid = profile.id;
+            profileById.set(uid, profile.data() ?? {});
+
+            const snapshot = await db
+                .collection(`users/${uid}/tasks`)
+                .where("remindAt", ">", now - LOOKBACK_MS)
+                .where("remindAt", "<=", now)
+                .get();
+
+            checked += snapshot.size;
+
+            for (const docSnap of snapshot.docs) {
+                const data = docSnap.data();
+                if (data.isDone) continue;
+                // reminderSentAt holds the send timestamp once sent, and is
+                // null or absent while the reminder is still owed.
+                if (data.reminderSentAt != null) continue;
+
+                const bucket = byUser.get(uid) ?? [];
+                bucket.push({
+                    id: docSnap.ref.path,
+                    task: {
+                        title: String(data.title ?? "Untitled task"),
+                        date: String(data.date ?? ""),
+                        time: String(data.time ?? ""),
+                        description:
+                            typeof data.description === "string"
+                                ? data.description
+                                : undefined,
+                    },
+                });
+                byUser.set(uid, bucket);
+            }
+        }
     } catch (error) {
         console.error("Reminder sweep could not read tasks", error);
         return NextResponse.json(
@@ -65,35 +124,6 @@ export async function GET(request: Request) {
             },
             { status: 500 },
         );
-    }
-
-    // Group by owner so a user with three things due gets one email, not three.
-    const byUser = new Map<string, { id: string; task: DueTask }[]>();
-
-    for (const docSnap of snapshot.docs) {
-        const uid = docSnap.ref.parent.parent?.id;
-        if (!uid) continue;
-
-        const data = docSnap.data();
-        if (data.isDone) continue;
-        // Already reminded — reminderSentAt holds the send timestamp once sent,
-        // and is null (or absent) while the reminder is still pending.
-        if (data.reminderSentAt != null) continue;
-
-        const bucket = byUser.get(uid) ?? [];
-        bucket.push({
-            id: docSnap.ref.path,
-            task: {
-                title: String(data.title ?? "Untitled task"),
-                date: String(data.date ?? ""),
-                time: String(data.time ?? ""),
-                description:
-                    typeof data.description === "string"
-                        ? data.description
-                        : undefined,
-            },
-        });
-        byUser.set(uid, bucket);
     }
 
     // Trim a trailing slash so email links don't come out as "…app//calendar".
@@ -116,10 +146,10 @@ export async function GET(request: Request) {
         };
 
         try {
-            const profile = await db.doc(`users/${uid}`).get();
-            const data = profile.data();
+            // Already loaded in the pass above; no second read.
+            const data = profileById.get(uid);
 
-            if (profile.exists && data?.remindersEnabled === false) {
+            if (data?.remindersEnabled === false) {
                 skipped += items.length;
                 await stamp();
                 continue;
@@ -164,7 +194,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
         provider,
-        checked: snapshot.size,
+        checked,
         recipients: byUser.size,
         sent,
         skipped,
