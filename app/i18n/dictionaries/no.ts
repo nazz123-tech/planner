@@ -13,8 +13,11 @@ export const no: Dictionary = {
     "nav.remindersOn": "Påminnelser på",
     "nav.remindersOff": "Påminnelser av",
     "nav.language": "Språk",
-    "nav.remindersHint": "Påminnelser på — e-post 2 timer før en oppgave",
+    "nav.remindersHint": "Påminnelser på — et varsel 2 timer før en oppgave",
     "nav.settingSaveFailed": "Kunne ikke lagre innstillingen",
+    "notify.startsAt": "Starter {time}",
+    "notify.blocked": "Varsler er blokkert — tillat dem for dette nettstedet i nettleserinnstillingene",
+    "notify.unsupported": "Denne nettleseren støtter ikke varsler",
 
     // ---- auth ----
     "auth.login.title": "Logg inn",
