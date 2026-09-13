@@ -12,8 +12,11 @@ export const uk: Dictionary = {
     "nav.remindersOn": "Нагадування увімкнені",
     "nav.remindersOff": "Нагадування вимкнені",
     "nav.language": "Мова",
-    "nav.remindersHint": "Нагадування увімкнені — лист за 2 години до завдання",
+    "nav.remindersHint": "Нагадування увімкнені — сповіщення за 2 години до завдання",
     "nav.settingSaveFailed": "Не вдалося зберегти налаштування",
+    "notify.startsAt": "Початок о {time}",
+    "notify.blocked": "Сповіщення заблоковані — дозвольте їх для цього сайту в налаштуваннях браузера",
+    "notify.unsupported": "Цей браузер не підтримує сповіщення",
 
     // ---- auth ----
     "auth.login.title": "Вхід",

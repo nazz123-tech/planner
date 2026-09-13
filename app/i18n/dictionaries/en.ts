@@ -17,8 +17,11 @@ export const en = {
     "nav.remindersOn": "Task reminders on",
     "nav.remindersOff": "Task reminders off",
     "nav.language": "Language",
-    "nav.remindersHint": "Task reminders on — emailed 2 hours before a task",
+    "nav.remindersHint": "Reminders on — a notification 2 hours before a task",
     "nav.settingSaveFailed": "Couldn’t save that setting",
+    "notify.startsAt": "Starts at {time}",
+    "notify.blocked": "Notifications are blocked — allow them for this site in your browser settings",
+    "notify.unsupported": "This browser can’t show notifications",
 
     // ---- auth ----
     "auth.login.title": "Login",
