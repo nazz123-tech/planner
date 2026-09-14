@@ -1,0 +1,206 @@
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+.heading {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.sub {
+    font-family: var(--font-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.row {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.inputWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* flex-basis 0 + min-width 0 so a long URL can't widen the row past the
+       modal and push the button off the edge. */
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.inputIcon {
+    position: absolute;
+    left: 14px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.input {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px 0 38px;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-secondary);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.input:focus-visible {
+    border-color: var(--accent);
+}
+
+.submit {
+    flex: none;
+    height: 48px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 9999px;
+    background: var(--primary);
+    color: var(--text-on-primary);
+    font-family: var(--font-main);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 200ms ease;
+}
+
+@media (hover: hover) and (min-width: 1281px) {
+    .submit:hover:not(:disabled) {
+        background: var(--accent);
+    }
+}
+
+.submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.error {
+    font-family: var(--font-secondary);
+    font-size: 13px;
+    color: #cb3534;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    list-style: none;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: var(--card-background);
+}
+
+.item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.itemText {
+    /* min-width:0 lets the name ellipsise instead of shoving the buttons out. */
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.itemName {
+    font-family: var(--font-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.itemMeta {
+    font-family: var(--font-secondary);
+    font-size: 12px;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.iconBtn {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--background);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 200ms ease, border-color 200ms ease;
+}
+
+@media (hover: hover) and (min-width: 1281px) {
+    .iconBtn:hover:not(:disabled) {
+        color: var(--text-primary);
+        border-color: var(--accent);
+    }
+    .danger:hover:not(:disabled) {
+        color: #cb3534;
+        border-color: #cb3534;
+    }
+}
+
+.iconBtn:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.spinning {
+    animation: subscribe-spin 0.9s linear infinite;
+}
+
+@keyframes subscribe-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinning {
+        animation: none;
+    }
+}
+
+/* ---- mobile (<= 800px) ---- */
+@media (max-width: 800px) {
+    .heading {
+        font-size: 22px;
+    }
+
+    /* The URL field needs the whole width on a phone, so the button drops
+       under it rather than squeezing both onto one line. */
+    .row {
+        flex-direction: column;
+    }
+
+    .submit {
+        width: 100%;
+    }
+}

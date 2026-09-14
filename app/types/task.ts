@@ -12,4 +12,8 @@ export interface Task {
   remindAt?: number | null;
   /** Epoch ms the reminder was sent. Null means "still owed". */
   reminderSentAt?: number | null;
+  /** Set when the task came from a subscribed calendar, not from the user. */
+  sourceSubId?: string;
+  /** The feed's VEVENT UID, which is what makes re-syncing idempotent. */
+  sourceUid?: string;
 }
