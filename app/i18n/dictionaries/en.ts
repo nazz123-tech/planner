@@ -243,6 +243,23 @@ export const en = {
     "import.boardEmoji": "Board emoji",
     "import.boardName": "Board name",
 
+    // ---- calendar subscriptions ----
+    "subscribe.heading": "Subscribe to a calendar",
+    "subscribe.hint": "Paste a calendar link (.ics or webcal) and its events appear here, kept in step when the source changes.",
+    "subscribe.placeholder": "https://… .ics",
+    "subscribe.submit": "Subscribe",
+    "subscribe.adding": "Checking…",
+    "subscribe.added": "Subscribed to “{name}” — {count} events",
+    "subscribe.synced": "Updated: {added} added, {updated} changed, {removed} removed",
+    "subscribe.failed": "Couldn’t read that calendar",
+    "subscribe.meta": "{count} events · updated {when}",
+    "subscribe.never": "never",
+    "subscribe.refresh": "Refresh now",
+    "subscribe.remove": "Unsubscribe",
+    "subscribe.removeTitle": "Unsubscribe?",
+    "subscribe.removeMessage": "“{name}” and the events it added will be removed. Your own tasks are untouched.",
+    "subscribe.removed": "Unsubscribed — {count} events removed",
+
     // ---- generic ----
     "common.cancel": "Cancel",
     "common.delete": "Delete",

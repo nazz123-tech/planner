@@ -240,6 +240,23 @@ export const no: Dictionary = {
     "import.boardEmoji": "Tavle-emoji",
     "import.boardName": "Tavlenavn",
 
+    // ---- calendar subscriptions ----
+    "subscribe.heading": "Abonner på en kalender",
+    "subscribe.hint": "Lim inn en kalenderlenke (.ics eller webcal), så dukker hendelsene opp her og holdes i takt med kilden.",
+    "subscribe.placeholder": "https://… .ics",
+    "subscribe.submit": "Abonner",
+    "subscribe.adding": "Sjekker…",
+    "subscribe.added": "Abonnerer på «{name}» — {count} hendelser",
+    "subscribe.synced": "Oppdatert: {added} lagt til, {updated} endret, {removed} fjernet",
+    "subscribe.failed": "Kunne ikke lese den kalenderen",
+    "subscribe.meta": "{count} hendelser · oppdatert {when}",
+    "subscribe.never": "aldri",
+    "subscribe.refresh": "Oppdater nå",
+    "subscribe.remove": "Avslutt abonnement",
+    "subscribe.removeTitle": "Avslutte abonnementet?",
+    "subscribe.removeMessage": "«{name}» og hendelsene den la til blir fjernet. Dine egne oppgaver berøres ikke.",
+    "subscribe.removed": "Abonnement avsluttet — {count} hendelser fjernet",
+
     // ---- generic ----
     "common.cancel": "Avbryt",
     "common.delete": "Slett",

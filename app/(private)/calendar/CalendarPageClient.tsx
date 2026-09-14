@@ -8,6 +8,7 @@ import { useUpdateTask } from "@/app/hooks/tasks/useUpdateTask";
 import Modal from "@/app/components/ui/Modal/Modal";
 import { CreateForm } from "@/app/components/forms/CreateForm/CreateForm";
 import { ImportCalendarForm } from "@/app/components/forms/ImportCalendarForm/ImportCalendarForm";
+import { SubscribeCalendar } from "@/app/components/forms/SubscribeCalendar/SubscribeCalendar";
 import { DayDetails } from "@/app/components/ui/DayDetails/DayDetails";
 import styles from "./page.module.css";
 
@@ -99,6 +100,9 @@ export default function CalendarPageClient() {
             </Modal>
 
             <Modal open={importOpen} onClose={() => setImportOpen(false)}>
+                {/* Subscribing is the live option and comes first; the file
+                    import below it stays for one-off exports. */}
+                <SubscribeCalendar />
                 <ImportCalendarForm
                     onSuccess={() => setImportOpen(false)}
                     onCancel={() => setImportOpen(false)}

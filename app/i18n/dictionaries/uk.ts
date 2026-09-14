@@ -238,6 +238,23 @@ export const uk: Dictionary = {
     "import.boardEmoji": "Емодзі дошки",
     "import.boardName": "Назва дошки",
 
+    // ---- calendar subscriptions ----
+    "subscribe.heading": "Підписка на календар",
+    "subscribe.hint": "Вставте посилання на календар (.ics або webcal) — його події зʼявляться тут і оновлюватимуться разом із джерелом.",
+    "subscribe.placeholder": "https://… .ics",
+    "subscribe.submit": "Підписатися",
+    "subscribe.adding": "Перевіряємо…",
+    "subscribe.added": "Підписано на «{name}» — подій: {count}",
+    "subscribe.synced": "Оновлено: додано {added}, змінено {updated}, видалено {removed}",
+    "subscribe.failed": "Не вдалося прочитати цей календар",
+    "subscribe.meta": "Подій: {count} · оновлено {when}",
+    "subscribe.never": "ніколи",
+    "subscribe.refresh": "Оновити зараз",
+    "subscribe.remove": "Відписатися",
+    "subscribe.removeTitle": "Відписатися?",
+    "subscribe.removeMessage": "«{name}» та додані ним події буде видалено. Ваші власні завдання залишаться.",
+    "subscribe.removed": "Відписано — видалено подій: {count}",
+
     // ---- generic ----
     "common.cancel": "Скасувати",
     "common.delete": "Видалити",
